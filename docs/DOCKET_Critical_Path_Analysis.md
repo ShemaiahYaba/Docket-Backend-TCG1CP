@@ -6,59 +6,163 @@
 
 ## Flow Diagram
 
-```mermaid
-flowchart TD
-    A([🚀 START]) --> B
-
-    subgraph CRITICAL ["🔴 CRITICAL PATH — Must complete in order"]
-        B["1️⃣ Project Setup\n─────────────────\n• Init repo & folder structure\n• Express app scaffold\n• dotenv + environment config\n• CORS + Helmet\n• Morgan logger\n• Base error handler\n• package.json scripts"]
-
-        B --> C["2️⃣ Database — Migrations & Models\n─────────────────\n• Sequelize config + DB connection\n• lawyers table + model\n• clients table + model\n• cases table + model\n• hearings table + model\n• All associations defined\n• Migration files run & verified"]
-
-        C --> D["3️⃣ Authentication System\n─────────────────\n• POST /api/auth/login\n• POST /api/auth/logout\n• GET /api/auth/me\n• JWT generation + verification\n• bcrypt password hashing\n• auth middleware (protects all routes)\n• role middleware (senior_partner / associate / secretary)"]
-    end
-
-    subgraph HIGH ["🟡 HIGH PRIORITY — Unblocks frontend & mobile fast"]
-        D --> E["4️⃣ Lawyers Module\n─────────────────\n• GET /api/lawyers\n• POST /api/lawyers\n• GET /api/lawyers/:id\n• PUT /api/lawyers/:id\n• PATCH /api/lawyers/:id/deactivate\n• Role checks applied\n• Validation rules applied"]
-
-        D --> F["5️⃣ Clients Module\n─────────────────\n• GET /api/clients\n• POST /api/clients\n• GET /api/clients/:id\n• PUT /api/clients/:id\n• DELETE /api/clients/:id\n• Role checks applied\n• Validation rules applied"]
-
-        E --> G["6️⃣ Cases Module\n─────────────────\n• GET /api/cases\n• POST /api/cases\n• GET /api/cases/:id\n• PUT /api/cases/:id\n• DELETE /api/cases/:id\n• PATCH /api/cases/:id/assign\n• PATCH /api/cases/:id/status\n• GET /api/cases/:id/hearings\n• Role checks applied\n• Validation rules applied\n• Case ID generation (SLT-001...)"]
-
-        F --> G
-
-        G --> H["7️⃣ Database Seeders\n─────────────────\n• Seed lawyers (all 3 roles)\n• Seed clients (individual + corporate)\n• Seed cases (all 5 statuses)\n• Seed hearings (past + upcoming)\n• Realistic Nigerian law firm data"]
-    end
-
-    subgraph PARALLEL ["🟢 NON-BLOCKING — Build in parallel once HIGH PRIORITY is done"]
-        H --> I["8️⃣ Hearings Module\n─────────────────\n• GET /api/hearings\n• POST /api/hearings\n• GET /api/hearings/:id\n• PUT /api/hearings/:id\n• DELETE /api/hearings/:id\n• Future-date validation\n• Case status check (no Closed cases)\n• Urgency flag logic (≤3 / ≤7 days)"]
-
-        H --> J["9️⃣ Dashboard Endpoints\n─────────────────\n• GET /api/dashboard/stats\n• GET /api/dashboard/upcoming-hearings\n• GET /api/dashboard/recent-cases\n• Aggregation queries\n• Role-based data scoping\n• Associate sees own data only"]
-
-        H --> K["🔟 Filters & Search\n─────────────────\n• Cases: status filter\n• Cases: case_type filter\n• Cases: lawyer_id filter\n• Cases: text search (title, ID, client)\n• Hearings: upcoming filter\n• Hearings: this_week filter\n• Hearings: case_id filter\n• Pagination on list endpoints"]
-    end
-
-    subgraph STANDALONE ["⚪ STANDALONE — Zero dependencies, build anytime"]
-        I --> L["1️⃣1️⃣ Swagger Documentation\n─────────────────\n• swagger-jsdoc setup\n• swagger-ui-express at /api/docs\n• All endpoints documented\n• Request/response examples\n• Auth header documented\n• Error responses documented"]
-
-        J --> L
-        K --> L
-
-        B --> M["1️⃣2️⃣ Email Service\n─────────────────\n• Nodemailer config\n• Welcome email on registration\n• Password reset flow\n• Email template utilities"]
-
-        B --> N["1️⃣3️⃣ Cron Job — Hearing Alerts\n─────────────────\n• node-cron setup\n• Daily job: find hearings in ≤3 days\n• Daily job: find hearings in ≤1 day\n• Trigger email to assigned lawyer\n• Trigger email to senior partner\n• Runs independently of all routes"]
-    end
-
-    L --> O([✅ API COMPLETE — READY FOR PRESENTATION])
-    M --> O
-    N --> O
-
-    style A fill:#1a1a2e,color:#fff,stroke:#C9A84C,stroke-width:2px
-    style O fill:#1a1a2e,color:#fff,stroke:#3DB87A,stroke-width:2px
-    style CRITICAL fill:#2d0a0a,color:#fff,stroke:#E05252,stroke-width:2px
-    style HIGH fill:#2d1f00,color:#fff,stroke:#E8894A,stroke-width:2px
-    style PARALLEL fill:#0a2d0a,color:#fff,stroke:#3DB87A,stroke-width:2px
-    style STANDALONE fill:#1a1a2e,color:#fff,stroke:#8A9BB0,stroke-width:2px
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                          🚀  START                                  │
+└──────────────────────────────┬──────────────────────────────────────┘
+                               │
+                               ▼
+╔═════════════════════════════════════════════════════════════════════╗
+║              🔴  CRITICAL PATH — Must complete in order             ║
+║                                                                     ║
+║  ┌─────────────────────────────────────────────────────────────┐   ║
+║  │  1️⃣  PROJECT SETUP                                          │   ║
+║  │  • Init repo & folder structure                             │   ║
+║  │  • Express app scaffold                                     │   ║
+║  │  • dotenv + environment config                              │   ║
+║  │  • CORS + Helmet + Morgan                                   │   ║
+║  │  • Base error handler + 404 handler                        │   ║
+║  │  • Health check route  GET /api/health                     │   ║
+║  │  • package.json scripts (start, dev, migrate, seed)        │   ║
+║  └──────────────────────────┬────────────────────────────────┘   ║
+║                             │                                       ║
+║                             ▼                                       ║
+║  ┌─────────────────────────────────────────────────────────────┐   ║
+║  │  2️⃣  DATABASE — MIGRATIONS & MODELS                         │   ║
+║  │  • Sequelize config + DB connection test                    │   ║
+║  │  • lawyers table + model       (migrate first — no FKs)    │   ║
+║  │  • clients table + model       (migrate second — no FKs)   │   ║
+║  │  • cases table + model         (FK → lawyers, clients)     │   ║
+║  │  • hearings table + model      (FK → cases, lawyers)       │   ║
+║  │  • All Sequelize associations defined                       │   ║
+║  └──────────────────────────┬────────────────────────────────┘   ║
+║                             │                                       ║
+║                             ▼                                       ║
+║  ┌─────────────────────────────────────────────────────────────┐   ║
+║  │  3️⃣  AUTHENTICATION SYSTEM                                  │   ║
+║  │  • POST  /api/auth/login    → returns JWT                   │   ║
+║  │  • POST  /api/auth/logout                                   │   ║
+║  │  • GET   /api/auth/me                                       │   ║
+║  │  • JWT generation + verification (jsonwebtoken)             │   ║
+║  │  • bcrypt password hashing                                  │   ║
+║  │  • auth middleware  → attaches req.user to every request    │   ║
+║  │  • role middleware  → requireRole('senior_partner') etc.    │   ║
+║  └──────────────────────────┬────────────────────────────────┘   ║
+╚═════════════════════════════╪═══════════════════════════════════════╝
+                              │
+                              ▼
+╔═════════════════════════════════════════════════════════════════════╗
+║         🟡  HIGH PRIORITY — Unblocks frontend & mobile fast         ║
+║                                                                     ║
+║              ┌──────────────┴──────────────┐                       ║
+║              │                             │                       ║
+║              ▼                             ▼                       ║
+║  ┌───────────────────────┐   ┌───────────────────────────┐        ║
+║  │  4️⃣  LAWYERS MODULE   │   │  5️⃣  CLIENTS MODULE       │        ║
+║  │                       │   │                           │        ║
+║  │  GET    /api/lawyers  │   │  GET    /api/clients      │        ║
+║  │  POST   /api/lawyers  │   │  POST   /api/clients      │        ║
+║  │  GET    /api/lawyers  │   │  GET    /api/clients/:id  │        ║
+║  │         /:id          │   │  PUT    /api/clients/:id  │        ║
+║  │  PUT    /api/lawyers  │   │  DELETE /api/clients/:id  │        ║
+║  │         /:id          │   │  Role checks applied      │        ║
+║  │  PATCH  /:id/         │   │  Validation applied       │        ║
+║  │         deactivate    │   └─────────────┬─────────────┘        ║
+║  │  Role checks applied  │                 │                       ║
+║  └──────────┬────────────┘                 │                       ║
+║             └──────────────┬───────────────┘                       ║
+║                            │                                        ║
+║                            ▼                                        ║
+║  ┌─────────────────────────────────────────────────────────────┐   ║
+║  │  6️⃣  CASES MODULE  (most complex — must be owned by         │   ║
+║  │                     a mid-level engineer)                   │   ║
+║  │                                                             │   ║
+║  │  GET    /api/cases                                          │   ║
+║  │  POST   /api/cases                                          │   ║
+║  │  GET    /api/cases/:id                                      │   ║
+║  │  PUT    /api/cases/:id                                      │   ║
+║  │  DELETE /api/cases/:id          (senior_partner only)       │   ║
+║  │  PATCH  /api/cases/:id/assign                               │   ║
+║  │  PATCH  /api/cases/:id/status                               │   ║
+║  │  GET    /api/cases/:id/hearings                             │   ║
+║  │  Case ID auto-generation  SLT-001, SLT-002...               │   ║
+║  │  Status lifecycle enforcement                               │   ║
+║  │  Role-scoped results (associate sees own cases only)        │   ║
+║  └──────────────────────────┬────────────────────────────────┘   ║
+║                             │                                       ║
+║                             ▼                                       ║
+║  ┌─────────────────────────────────────────────────────────────┐   ║
+║  │  7️⃣  DATABASE SEEDERS                                       │   ║
+║  │  • 6 lawyers  (1 senior_partner, 3 associates, 2 secretaries│   ║
+║  │  • 10 clients (individual + corporate mix)                  │   ║
+║  │  • 15–20 cases (all 5 statuses represented)                 │   ║
+║  │  • 10–15 hearings (past / today / ≤3d / ≤7d / future)      │   ║
+║  │  • Known test credentials seeded for all 3 roles            │   ║
+║  └──────────────────────────┬────────────────────────────────┘   ║
+╚═════════════════════════════╪═══════════════════════════════════════╝
+                              │
+                              ▼
+╔═════════════════════════════════════════════════════════════════════╗
+║      🟢  NON-BLOCKING — Build in parallel once seeders are done     ║
+║                                                                     ║
+║         ┌────────────────┬──────────────────┬───────────────┐      ║
+║         │                │                  │               │      ║
+║         ▼                ▼                  ▼               │      ║
+║  ┌────────────┐  ┌──────────────┐  ┌─────────────┐         │      ║
+║  │  8️⃣        │  │  9️⃣           │  │  🔟          │         │      ║
+║  │  HEARINGS  │  │  DASHBOARD   │  │  FILTERS &  │         │      ║
+║  │  MODULE    │  │  ENDPOINTS   │  │  SEARCH     │         │      ║
+║  │            │  │              │  │             │         │      ║
+║  │ GET        │  │ GET /stats   │  │ ?status=    │         │      ║
+║  │ /hearings  │  │ GET          │  │ ?case_type= │         │      ║
+║  │ POST       │  │ /upcoming-   │  │ ?lawyer_id= │         │      ║
+║  │ /hearings  │  │  hearings    │  │ ?search=    │         │      ║
+║  │ GET /:id   │  │ GET          │  │ ?filter=    │         │      ║
+║  │ PUT /:id   │  │ /recent-     │  │  upcoming   │         │      ║
+║  │ DELETE/:id │  │  cases       │  │ ?filter=    │         │      ║
+║  │            │  │ Role-scoped  │  │  this_week  │         │      ║
+║  │ Future date│  │ aggregations │  │ Pagination  │         │      ║
+║  │ validation │  │              │  │ ?page=      │         │      ║
+║  │ Urgency    │  │              │  │ &limit=     │         │      ║
+║  │ flag logic │  │              │  │             │         │      ║
+║  └─────┬──────┘  └──────┬───────┘  └──────┬──────┘         │      ║
+║        └────────────────┴──────────────────┘               │      ║
+╚════════════════════════════════════════════════════════════╪════════╝
+                                                             │
+                                                             ▼
+╔═════════════════════════════════════════════════════════════════════╗
+║         ⚪  STANDALONE — Zero dependencies, build anytime           ║
+║                                                                     ║
+║  ┌───────────────────────────────────────────────────────────┐     ║
+║  │  1️⃣1️⃣  SWAGGER DOCUMENTATION                              │     ║
+║  │  • swagger-jsdoc + swagger-ui-express                     │     ║
+║  │  • Accessible at  GET /api/docs                           │     ║
+║  │  • All 25+ endpoints documented                           │     ║
+║  │  • Request body + response schemas                        │     ║
+║  │  • Auth header + error responses documented               │     ║
+║  └───────────────────────────────────────────────────────────┘     ║
+║                                                                     ║
+║  ┌───────────────────────────────────────────────────────────┐     ║
+║  │  1️⃣2️⃣  EMAIL SERVICE  (Nodemailer)                        │     ║
+║  │  • SMTP config via .env                                   │     ║
+║  │  • Welcome email on new lawyer account                    │     ║
+║  │  • Hearing confirmation email                             │     ║
+║  │  • Hearing alert emails (≤3 days, ≤1 day)                │     ║
+║  └───────────────────────────────────────────────────────────┘     ║
+║                                                                     ║
+║  ┌───────────────────────────────────────────────────────────┐     ║
+║  │  1️⃣3️⃣  CRON JOB — HEARING ALERTS  (node-cron)            │     ║
+║  │  • Runs daily at 08:00 WAT                                │     ║
+║  │  • Query hearings within ≤3 days → trigger email          │     ║
+║  │  • Query hearings within ≤1 day  → trigger email          │     ║
+║  │  • Completely independent of all API routes               │     ║
+║  └───────────────────────────────────────────────────────────┘     ║
+╚═════════════════════════════════════════════════════════════════════╝
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│              ✅  API COMPLETE — READY FOR PRESENTATION               │
+└─────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
