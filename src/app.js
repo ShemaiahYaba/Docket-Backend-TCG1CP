@@ -6,6 +6,7 @@ const morgan = require("morgan");
 const settings = require("./config/settings");
 const corsMiddleware = require("./config/cors");
 const { logServerStart } = require("./config/logger");
+const { swaggerUi, swaggerSpec } = require("./config/swagger");
 const routes = require("./routes");
 const { notFoundHandler, errorHandler } = require("./middlewares/error");
 
@@ -24,8 +25,11 @@ app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "templates"));
 
-// Root redirect → /api
-app.get("/", (req, res) => res.redirect("/api"));
+// Root redirect → /api/docs
+app.get("/", (req, res) => res.redirect("/api/docs"));
+
+// Swagger UI
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use("/api", routes);

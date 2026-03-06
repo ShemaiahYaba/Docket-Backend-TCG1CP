@@ -3,32 +3,10 @@ const { Router } = require("express");
 const router = Router();
 
 /**
- * API Index
+ * API Index — redirect to Swagger docs
  * GET /api
  */
-router.get("/", (req, res) => {
-  const payload = {
-    name: "Docket API",
-    description: "Legal Case Management Platform — Backend API",
-    version: "1.0.0",
-    health: "/api/health",
-    docs: "/api/docs",
-  };
-
-  if (req.accepts(["json", "html"]) === "html") {
-    res.set("Cache-Control", "no-store");
-    return res.render("response", {
-      title: "API Index",
-      method: req.method,
-      route: req.originalUrl,
-      statusCode: 200,
-      timestamp: new Date().toISOString(),
-      data: payload,
-    });
-  }
-
-  res.status(200).json(payload);
-});
+router.get("/", (req, res) => res.redirect("/api/docs"));
 
 /**
  * Health Check
