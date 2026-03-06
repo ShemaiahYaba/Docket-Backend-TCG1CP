@@ -1,0 +1,638 @@
+{
+  "info": {
+    "name": "Docket API",
+    "description": "Legal Case Management Platform — Complete API Collection\nCapstone 2026\n\nBase URL: http://localhost:5000/api\n\nUsage:\n1. Run POST /auth/login first\n2. Copy the token from the response\n3. Set it in the collection variable 'token'\n4. All other requests will use it automatically",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:5000/api", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "case_id", "value": "SLT-001", "type": "string" },
+    { "key": "lawyer_id", "value": "", "type": "string" },
+    { "key": "client_id", "value": "", "type": "string" },
+    { "key": "hearing_id", "value": "", "type": "string" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/health", "host": ["{{base_url}}"], "path": ["health"] },
+            "description": "Verify the API is running. No auth required."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login — Senior Partner",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.data.token) {",
+                  "  pm.collectionVariables.set('token', res.data.token);",
+                  "  console.log('Token saved to collection variable');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"senior@docket.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Login as Senior Partner. Token is automatically saved to the collection variable."
+          }
+        },
+        {
+          "name": "Login — Associate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"associate@docket.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Login as Associate Lawyer."
+          }
+        },
+        {
+          "name": "Login — Secretary",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"secretary@docket.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Login as Legal Secretary."
+          }
+        },
+        {
+          "name": "Login — Invalid Credentials",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"nobody@docket.com\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] },
+            "description": "Should return 401 Unauthorized."
+          }
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/auth/me", "host": ["{{base_url}}"], "path": ["auth", "me"] },
+            "description": "Returns the currently authenticated user's profile."
+          }
+        },
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "{{base_url}}/auth/logout", "host": ["{{base_url}}"], "path": ["auth", "logout"] },
+            "description": "Logs out the current user."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Lawyers",
+      "item": [
+        {
+          "name": "GET /lawyers — All",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/lawyers", "host": ["{{base_url}}"], "path": ["lawyers"] },
+            "description": "Get all active lawyers."
+          }
+        },
+        {
+          "name": "POST /lawyers — Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Ngozi Eze\",\n  \"email\": \"ngozi@docket.com\",\n  \"password\": \"Password123!\",\n  \"specialty\": \"Family Law\",\n  \"role\": \"associate\",\n  \"phone\": \"+2348031234567\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/lawyers", "host": ["{{base_url}}"], "path": ["lawyers"] },
+            "description": "Create a new lawyer. Senior partner only."
+          }
+        },
+        {
+          "name": "POST /lawyers — Missing Fields (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"incomplete@docket.com\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/lawyers", "host": ["{{base_url}}"], "path": ["lawyers"] },
+            "description": "Should return 400 with field-level validation errors."
+          }
+        },
+        {
+          "name": "GET /lawyers/:id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/lawyers/{{lawyer_id}}", "host": ["{{base_url}}"], "path": ["lawyers", "{{lawyer_id}}"] },
+            "description": "Get a single lawyer by ID."
+          }
+        },
+        {
+          "name": "PUT /lawyers/:id — Update",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"specialty\": \"Corporate Law\",\n  \"phone\": \"+2348099887766\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/lawyers/{{lawyer_id}}", "host": ["{{base_url}}"], "path": ["lawyers", "{{lawyer_id}}"] },
+            "description": "Update lawyer profile. Senior partner only."
+          }
+        },
+        {
+          "name": "PATCH /lawyers/:id/deactivate",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{base_url}}/lawyers/{{lawyer_id}}/deactivate", "host": ["{{base_url}}"], "path": ["lawyers", "{{lawyer_id}}", "deactivate"] },
+            "description": "Deactivate a lawyer account. Senior partner only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Clients",
+      "item": [
+        {
+          "name": "GET /clients — All",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/clients", "host": ["{{base_url}}"], "path": ["clients"] },
+            "description": "Get all active clients."
+          }
+        },
+        {
+          "name": "GET /clients — Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/clients?search=johnson",
+              "host": ["{{base_url}}"],
+              "path": ["clients"],
+              "query": [{ "key": "search", "value": "johnson" }]
+            },
+            "description": "Search clients by name or email."
+          }
+        },
+        {
+          "name": "POST /clients — Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Emeka Johnson\",\n  \"email\": \"emeka@johnson.com\",\n  \"phone\": \"+2348023456789\",\n  \"client_type\": \"individual\",\n  \"address\": \"14 Broad Street, Lagos\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/clients", "host": ["{{base_url}}"], "path": ["clients"] },
+            "description": "Create a new client. Senior partner or secretary."
+          }
+        },
+        {
+          "name": "POST /clients — Corporate",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"TechBridge Nigeria Ltd\",\n  \"email\": \"legal@techbridge.ng\",\n  \"phone\": \"+2341234567890\",\n  \"client_type\": \"corporate\",\n  \"address\": \"Plot 5, Victoria Island, Lagos\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/clients", "host": ["{{base_url}}"], "path": ["clients"] },
+            "description": "Create a corporate client."
+          }
+        },
+        {
+          "name": "GET /clients/:id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/clients/{{client_id}}", "host": ["{{base_url}}"], "path": ["clients", "{{client_id}}"] },
+            "description": "Get client profile and associated cases."
+          }
+        },
+        {
+          "name": "PUT /clients/:id — Update",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+2348099001122\",\n  \"address\": \"22 Marina Road, Lagos\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/clients/{{client_id}}", "host": ["{{base_url}}"], "path": ["clients", "{{client_id}}"] },
+            "description": "Update client info. Senior partner or secretary."
+          }
+        },
+        {
+          "name": "DELETE /clients/:id — Soft Delete",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/clients/{{client_id}}", "host": ["{{base_url}}"], "path": ["clients", "{{client_id}}"] },
+            "description": "Soft-delete a client. Senior partner only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cases",
+      "item": [
+        {
+          "name": "GET /cases — All",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases", "host": ["{{base_url}}"], "path": ["cases"] },
+            "description": "Get all cases. Associates see own cases only."
+          }
+        },
+        {
+          "name": "GET /cases — Filter by Status",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/cases?status=Active",
+              "host": ["{{base_url}}"],
+              "path": ["cases"],
+              "query": [{ "key": "status", "value": "Active" }]
+            },
+            "description": "Filter cases by status."
+          }
+        },
+        {
+          "name": "GET /cases — Filter by Type",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/cases?case_type=Criminal",
+              "host": ["{{base_url}}"],
+              "path": ["cases"],
+              "query": [{ "key": "case_type", "value": "Criminal" }]
+            },
+            "description": "Filter cases by case type."
+          }
+        },
+        {
+          "name": "GET /cases — Search",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/cases?search=johnson",
+              "host": ["{{base_url}}"],
+              "path": ["cases"],
+              "query": [{ "key": "search", "value": "johnson" }]
+            },
+            "description": "Search cases by title, ID, or client name."
+          }
+        },
+        {
+          "name": "GET /cases — Combined Filters + Pagination",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/cases?status=Active&case_type=Criminal&page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["cases"],
+              "query": [
+                { "key": "status", "value": "Active" },
+                { "key": "case_type", "value": "Criminal" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Multiple filters with pagination."
+          }
+        },
+        {
+          "name": "POST /cases — Create",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Johnson v. Federal Republic of Nigeria\",\n  \"description\": \"Criminal appeal against unlawful detention\",\n  \"case_type\": \"Criminal\",\n  \"client_id\": \"{{client_id}}\",\n  \"lawyer_id\": \"{{lawyer_id}}\",\n  \"filed_date\": \"2026-03-06\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/cases", "host": ["{{base_url}}"], "path": ["cases"] },
+            "description": "Create a new case. Senior partner or secretary only."
+          }
+        },
+        {
+          "name": "POST /cases — No Lawyer (Unassigned)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Obi Estate Dispute\",\n  \"case_type\": \"Property\",\n  \"client_id\": \"{{client_id}}\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/cases", "host": ["{{base_url}}"], "path": ["cases"] },
+            "description": "Create a case without assigning a lawyer."
+          }
+        },
+        {
+          "name": "GET /cases/:id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}"] },
+            "description": "Get full case detail."
+          }
+        },
+        {
+          "name": "PUT /cases/:id — Update",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Johnson v. Federal Republic of Nigeria (Amended)\",\n  \"description\": \"Updated case description after new evidence\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}"] },
+            "description": "Update case fields."
+          }
+        },
+        {
+          "name": "DELETE /cases/:id — Soft Delete",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}"] },
+            "description": "Soft-delete a case. Senior partner only."
+          }
+        },
+        {
+          "name": "PATCH /cases/:id/assign",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"lawyer_id\": \"{{lawyer_id}}\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}/assign", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}", "assign"] },
+            "description": "Assign or reassign a lawyer to a case."
+          }
+        },
+        {
+          "name": "PATCH /cases/:id/status — Set Active",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Active\"\n}" },
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}/status", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}", "status"] },
+            "description": "Update case status to Active."
+          }
+        },
+        {
+          "name": "PATCH /cases/:id/status — Set Urgent",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Urgent\"\n}" },
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}/status", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}", "status"] },
+            "description": "Mark case as Urgent."
+          }
+        },
+        {
+          "name": "PATCH /cases/:id/status — Set Closed",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"Closed\"\n}" },
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}/status", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}", "status"] },
+            "description": "Close a case. closed_date should be set automatically."
+          }
+        },
+        {
+          "name": "GET /cases/:id/hearings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}/hearings", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}", "hearings"] },
+            "description": "Get all hearings for a specific case."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Hearings",
+      "item": [
+        {
+          "name": "GET /hearings — All",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/hearings", "host": ["{{base_url}}"], "path": ["hearings"] },
+            "description": "Get all hearings."
+          }
+        },
+        {
+          "name": "GET /hearings — Upcoming",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/hearings?filter=upcoming",
+              "host": ["{{base_url}}"],
+              "path": ["hearings"],
+              "query": [{ "key": "filter", "value": "upcoming" }]
+            },
+            "description": "Get all future hearings."
+          }
+        },
+        {
+          "name": "GET /hearings — This Week",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/hearings?filter=this_week",
+              "host": ["{{base_url}}"],
+              "path": ["hearings"],
+              "query": [{ "key": "filter", "value": "this_week" }]
+            },
+            "description": "Get hearings within the next 7 days."
+          }
+        },
+        {
+          "name": "GET /hearings — By Case",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/hearings?case_id={{case_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["hearings"],
+              "query": [{ "key": "case_id", "value": "{{case_id}}" }]
+            },
+            "description": "Get all hearings for a specific case."
+          }
+        },
+        {
+          "name": "POST /hearings — Schedule",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"case_id\": \"{{case_id}}\",\n  \"hearing_date\": \"2026-04-15\",\n  \"hearing_time\": \"09:00\",\n  \"court_name\": \"High Court Lagos\",\n  \"notes\": \"Bring certified copies of all exhibits\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/hearings", "host": ["{{base_url}}"], "path": ["hearings"] },
+            "description": "Schedule a new hearing. Any authenticated user."
+          }
+        },
+        {
+          "name": "POST /hearings — Past Date (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"case_id\": \"{{case_id}}\",\n  \"hearing_date\": \"2020-01-01\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/hearings", "host": ["{{base_url}}"], "path": ["hearings"] },
+            "description": "Should return 400 — past date not allowed."
+          }
+        },
+        {
+          "name": "GET /hearings/:id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/hearings/{{hearing_id}}", "host": ["{{base_url}}"], "path": ["hearings", "{{hearing_id}}"] },
+            "description": "Get single hearing detail."
+          }
+        },
+        {
+          "name": "PUT /hearings/:id — Reschedule",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"hearing_date\": \"2026-05-01\",\n  \"hearing_time\": \"10:30\",\n  \"court_name\": \"Federal High Court Abuja\",\n  \"notes\": \"Rescheduled due to judge availability\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/hearings/{{hearing_id}}", "host": ["{{base_url}}"], "path": ["hearings", "{{hearing_id}}"] },
+            "description": "Reschedule or update hearing details."
+          }
+        },
+        {
+          "name": "PUT /hearings/:id — Add Outcome",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outcome\": \"Judgment reserved. Next date set for May 15.\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/hearings/{{hearing_id}}", "host": ["{{base_url}}"], "path": ["hearings", "{{hearing_id}}"] },
+            "description": "Record the outcome after a hearing takes place."
+          }
+        },
+        {
+          "name": "DELETE /hearings/:id",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{base_url}}/hearings/{{hearing_id}}", "host": ["{{base_url}}"], "path": ["hearings", "{{hearing_id}}"] },
+            "description": "Delete a hearing. Senior partner or secretary only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "GET /dashboard/stats",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/stats", "host": ["{{base_url}}"], "path": ["dashboard", "stats"] },
+            "description": "Get aggregate case statistics. Associates see personal stats only."
+          }
+        },
+        {
+          "name": "GET /dashboard/upcoming-hearings",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/upcoming-hearings", "host": ["{{base_url}}"], "path": ["dashboard", "upcoming-hearings"] },
+            "description": "Get next 10 upcoming hearings sorted by date."
+          }
+        },
+        {
+          "name": "GET /dashboard/recent-cases",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/dashboard/recent-cases", "host": ["{{base_url}}"], "path": ["dashboard", "recent-cases"] },
+            "description": "Get 10 most recently updated cases."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Test Cases",
+      "item": [
+        {
+          "name": "No Token — 401",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases", "host": ["{{base_url}}"], "path": ["cases"] },
+            "description": "Should return 401 — no token provided."
+          }
+        },
+        {
+          "name": "Wrong Role — 403",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Test Lawyer\",\n  \"email\": \"test@docket.com\",\n  \"password\": \"Password123!\",\n  \"specialty\": \"Civil\",\n  \"role\": \"associate\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/lawyers", "host": ["{{base_url}}"], "path": ["lawyers"] },
+            "description": "Login as associate first, then call this. Should return 403."
+          }
+        },
+        {
+          "name": "Not Found — 404",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases/SLT-999", "host": ["{{base_url}}"], "path": ["cases", "SLT-999"] },
+            "description": "Should return 404 — case does not exist."
+          }
+        },
+        {
+          "name": "Unknown Route — 404",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/this-route-does-not-exist", "host": ["{{base_url}}"], "path": ["this-route-does-not-exist"] },
+            "description": "Should return 404 from global catch-all handler."
+          }
+        }
+      ]
+    }
+  ]
+}
