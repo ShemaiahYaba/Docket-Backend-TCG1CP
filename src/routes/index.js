@@ -3,6 +3,34 @@ const { Router } = require("express");
 const router = Router();
 
 /**
+ * API Index
+ * GET /api
+ */
+router.get("/", (req, res) => {
+  const payload = {
+    name: "Docket API",
+    description: "Legal Case Management Platform — Backend API",
+    version: "1.0.0",
+    health: "/api/health",
+    docs: "/api/docs",
+  };
+
+  if (req.accepts(["json", "html"]) === "html") {
+    res.set("Cache-Control", "no-store");
+    return res.render("response", {
+      title: "API Index",
+      method: req.method,
+      route: req.originalUrl,
+      statusCode: 200,
+      timestamp: new Date().toISOString(),
+      data: payload,
+    });
+  }
+
+  res.status(200).json(payload);
+});
+
+/**
  * Health Check
  * GET /api/health
  *
@@ -12,7 +40,11 @@ const router = Router();
 router.get("/health", (req, res) => {
   const payload = { status: "ok" };
 
-  if (req.accepts("html") && !req.accepts("json")) {
+  // req.accepts(['json', 'html']) returns whichever the client prefers.
+  // Browsers send Accept: text/html first (q=1), so they get the EJS template.
+  // API clients (Postman, curl, fetch default) prefer json and get JSON.
+  if (req.accepts(["json", "html"]) === "html") {
+    res.set("Cache-Control", "no-store"); // prevent 304 on the HTML view
     return res.render("response", {
       title: "Health Check",
       method: req.method,

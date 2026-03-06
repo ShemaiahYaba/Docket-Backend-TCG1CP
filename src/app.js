@@ -24,6 +24,9 @@ app.use(express.json());
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "templates"));
 
+// Root redirect → /api
+app.get("/", (req, res) => res.redirect("/api"));
+
 // Routes
 app.use("/api", routes);
 

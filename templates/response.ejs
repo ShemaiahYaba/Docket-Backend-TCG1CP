@@ -1,134 +1,171 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Docket API — <%= title %></title>
-    <style>
-      *,
-      *::before,
-      *::after {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docket API — <%= title %></title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-      body {
-        font-family: "Courier New", Courier, monospace;
-        font-size: 14px;
-        background: #f5f5f5;
-        color: #111;
-        padding: 32px 24px;
-        line-height: 1.6;
-      }
+    body {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      background: #f5f5f5;
+      color: #111;
+      padding: 32px 24px;
+      line-height: 1.6;
+    }
 
-      header {
-        border-bottom: 2px solid #111;
-        padding-bottom: 12px;
-        margin-bottom: 24px;
-      }
+    header {
+      border-bottom: 2px solid #111;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
 
-      header h1 {
-        font-size: 16px;
-        font-weight: bold;
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-      }
+    header h1 {
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
 
-      .meta {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        flex-wrap: wrap;
-        font-size: 13px;
-        color: #444;
-      }
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #444;
+    }
 
-      .badge {
-        display: inline-block;
-        padding: 2px 10px;
-        border-radius: 3px;
-        font-weight: bold;
-        font-size: 12px;
-        border: 1px solid;
-      }
+    .badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 3px;
+      font-weight: bold;
+      font-size: 12px;
+      border: 1px solid;
+    }
 
-      .badge-2xx {
-        background: #e6f4ea;
-        color: #1a7a35;
-        border-color: #a8d5b5;
-      }
-      .badge-4xx {
-        background: #fdecea;
-        color: #a61c00;
-        border-color: #f5a9a0;
-      }
-      .badge-5xx {
-        background: #fff8e1;
-        color: #7a5c00;
-        border-color: #f0d070;
-      }
+    .badge-2xx { background: #e6f4ea; color: #1a7a35; border-color: #a8d5b5; }
+    .badge-4xx { background: #fdecea; color: #a61c00; border-color: #f5a9a0; }
+    .badge-5xx { background: #fff8e1; color: #7a5c00; border-color: #f0d070; }
 
-      .method {
-        font-weight: bold;
-        color: #111;
-      }
+    .method { font-weight: bold; color: #111; }
+    .route  { color: #333; }
+    .ts     { color: #888; font-size: 12px; }
 
-      .route {
-        color: #333;
-      }
+    .section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #777;
+      margin-bottom: 8px;
+      margin-top: 24px;
+    }
 
-      .ts {
-        color: #888;
-        font-size: 12px;
-      }
+    pre {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 20px 24px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 13px;
+      line-height: 1.7;
+    }
 
-      .body-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #777;
-        margin-bottom: 8px;
-      }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border: 1px solid #f5a9a0;
+      border-radius: 4px;
+      font-size: 13px;
+    }
 
-      pre {
-        background: #fff;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 20px 24px;
-        overflow-x: auto;
-        white-space: pre-wrap;
-        word-break: break-word;
-        font-size: 13px;
-        line-height: 1.7;
-      }
+    thead tr {
+      background: #fdecea;
+    }
 
-      footer {
-        margin-top: 32px;
-        padding-top: 12px;
-        border-top: 1px solid #ddd;
-        font-size: 11px;
-        color: #aaa;
-      }
-    </style>
-  </head>
-  <body>
-    <header>
-      <h1>Docket API — <%= title %></h1>
-      <div class="meta">
-        <% const group = Math.floor(statusCode / 100); const badgeClass = group
-        === 2 ? 'badge-2xx' : group === 4 ? 'badge-4xx' : 'badge-5xx'; %>
-        <span class="badge <%= badgeClass %>"><%= statusCode %></span>
-        <span class="method"><%= method %></span>
-        <span class="route"><%= route %></span>
-        <span class="ts"><%= timestamp %></span>
-      </div>
-    </header>
+    th, td {
+      text-align: left;
+      padding: 10px 16px;
+      border-bottom: 1px solid #f0ddd9;
+    }
 
-    <p class="body-label">Response Body</p>
-    <pre><%= JSON.stringify(data, null, 2) %></pre>
+    th {
+      font-weight: bold;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #a61c00;
+    }
 
-    <footer>Docket Backend · Legal Case Management API · Capstone 2026</footer>
-  </body>
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .field-name {
+      color: #a61c00;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 32px;
+      padding-top: 12px;
+      border-top: 1px solid #ddd;
+      font-size: 11px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Docket API — <%= title %></h1>
+    <div class="meta">
+      <%
+        const group = Math.floor(statusCode / 100);
+        const badgeClass = group === 2 ? 'badge-2xx' : group === 4 ? 'badge-4xx' : 'badge-5xx';
+      %>
+      <span class="badge <%= badgeClass %>"><%= statusCode %></span>
+      <span class="method"><%= method %></span>
+      <span class="route"><%= route %></span>
+      <span class="ts"><%= timestamp %></span>
+    </div>
+  </header>
+
+  <%
+    const hasErrors = typeof errors !== 'undefined' && errors && errors.length > 0;
+  %>
+
+  <p class="section-label">Response Body</p>
+  <pre><%= JSON.stringify(data, null, 2) %></pre>
+
+  <% if (hasErrors) { %>
+    <p class="section-label">Validation Errors (<%= errors.length %>)</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% errors.forEach(function(err) { %>
+          <tr>
+            <td class="field-name"><%= err.field %></td>
+            <td><%= err.message %></td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% } %>
+
+  <footer>Docket Backend · Legal Case Management API · Capstone 2026</footer>
+
+</body>
 </html>
