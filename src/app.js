@@ -8,7 +8,7 @@ const corsMiddleware = require("./config/cors");
 const { logServerStart } = require("./config/logger");
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 const routes = require("./routes");
-const { notFoundHandler, errorHandler } = require("./middlewares/error");
+const { notFoundHandler, errorHandler } = require("./middlewares/errors");
 
 // ─────────────────────────────────────────────────────────────────────────────
 const app = express();
