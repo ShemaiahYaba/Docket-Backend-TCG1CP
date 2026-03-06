@@ -1,21 +1,21 @@
-require("dotenv").config();
+const settings = require("./settings");
 
 module.exports = {
   development: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
+    username: settings.db.user,
+    password: settings.db.password,
+    database: settings.db.name,
+    host: settings.db.host,
+    port: settings.db.port,
     dialect: "mysql",
     logging: false,
   },
   production: {
-    username: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT || 3306,
+    username: settings.db.user,
+    password: settings.db.password,
+    database: settings.db.name,
+    host: settings.db.host,
+    port: settings.db.port,
     dialect: "mysql",
     logging: false,
   },
