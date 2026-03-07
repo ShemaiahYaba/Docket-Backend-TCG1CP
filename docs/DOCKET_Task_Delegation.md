@@ -307,12 +307,12 @@ if (req.query.search) {
 ---
 
 ### ⚪ TASK 11 — Swagger Documentation
-**Owner: Ola**  
-**Branch:** `feature/swagger-docs`  
-**Starts after:** Task 4 (lawyers) is merged — Ola's second task  
+**Owner: Shemaiah**
+**Branch:** `feature/swagger-docs`
+**Starts after:** Task 4 (lawyers) is merged
 **Deadline: Day 5**
 
-After Ola completes the lawyers module, Swagger documentation is a natural second task. It requires reading through all the routes and writing JSDoc annotations — good for reinforcing understanding of the whole API.
+Shemaiah owns Swagger documentation to ensure all endpoints are accurately and consistently documented across every module. As team lead, Shemaiah has the full picture of the API shape and can catch gaps or inconsistencies that a module owner might miss.
 
 | Deliverable | Detail |
 |-------------|--------|
@@ -377,7 +377,7 @@ Shemaiah owns email and cron because they are standalone but require careful int
 | 8. Hearings Module | **Sonia** | 🟢 Parallel | Task 6 | `feature/hearings-module` | Day 3–4 |
 | 9. Dashboard Endpoints | **Oluwaseyi** | 🟢 Parallel | Task 7 | `feature/dashboard` | Day 4 |
 | 10. Filters & Search | **Omotayo** | 🟢 Parallel | Task 5 | `feature/filters-search` | Day 4 |
-| 11. Swagger Docs | **Ola** | ⚪ Standalone | Task 4 | `feature/swagger-docs` | Day 5 |
+| 11. Swagger Docs | **Shemaiah** | ⚪ Standalone | Task 4 | `feature/swagger-docs` | Day 5 |
 | 12. Email Service | **Shemaiah** | ⚪ Standalone | Task 1 | `feature/email-service` | Day 4–5 |
 | 13. Cron Jobs | **Shemaiah** | ⚪ Standalone | Task 12 | `feature/cron-hearing-alerts` | Day 5 |
 
@@ -387,9 +387,9 @@ Shemaiah owns email and cron because they are standalone but require careful int
 
 | Name | Tasks | Type |
 |------|-------|------|
-| **Shemaiah** | 1, 2, 7, 12, 13 | Setup + Seeders + Standalone + Lead |
+| **Shemaiah** | 1, 2, 7, 11, 12, 13 | Setup + Seeders + Swagger + Standalone + Lead |
 | **Kuol** | 3, 6 | Auth + Cases (hardest two modules) |
-| **Ola** | 4, 11 | Lawyers + Swagger |
+| **Ola** | 4 | Lawyers |
 | **Omotayo** | 5, 10 | Clients + Filters |
 | **Sonia** | 8 | Hearings |
 | **Oluwaseyi** | 9 | Dashboard |
@@ -404,9 +404,9 @@ Shemaiah owns email and cron because they are standalone but require careful int
 | Day 1–2 | Review PRs + Email | Auth System | — | — | — | — |
 | Day 2–3 | Review PRs | Cases Module | Lawyers Module | Clients Module | — | — |
 | Day 3 | Seeders | Cases Module | Lawyers Module | Clients Module | — | — |
-| Day 3–4 | Email Service | Review + Unblock | Swagger Docs | Filters & Search | Hearings Module | — |
-| Day 4 | Cron Jobs | Review + Unblock | Swagger Docs | Filters & Search | Hearings Module | Dashboard |
-| Day 5 | Bug fixes + README | Final review | Swagger polish | Filters polish | Hearings polish | Dashboard polish |
+| Day 3–4 | Email Service + Swagger Docs | Review + Unblock | — | Filters & Search | Hearings Module | — |
+| Day 4 | Cron Jobs + Swagger Docs | Review + Unblock | — | Filters & Search | Hearings Module | Dashboard |
+| Day 5 | Bug fixes + README + Swagger polish | Final review | — | Filters polish | Hearings polish | Dashboard polish |
 | Day 6–7 | Demo prep + full test run | Support | — | — | — | — |
 
 ---
