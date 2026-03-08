@@ -1,15 +1,46 @@
-const { HTTP, ERR } = require("../../constants");
+'use strict';
+
+const { validationResult } = require('express-validator');
+const { HTTP, ERR } = require('../../constants');
 
 /**
- * Validation Error Handler
- * Handles express-validator field-level validation failures.
+ * Validation — single source of truth for all validation error handling.
  *
- * Note: Sequelize model-level SequelizeValidationErrors are handled
- * in ormError.js since they originate from the ORM layer.
+ * Two concerns live here:
+ *
+ *  1. `validate` middleware — placed AFTER express-validator rule arrays in routes,
+ *     BEFORE the controller. Reads accumulated validation errors and short-circuits
+ *     with 400 if any exist.
+ *
+ *     Usage in routes:
+ *       const { validate } = require('../middlewares/errors');
+ *       router.post('/clients', authMiddleware, [...rules], validate, controller);
+ *
+ *  2. `isValidationError` / `handleValidationError` — used by the global errorHandler
+ *     to catch any ValidationError passed via next(err) from a controller or service.
  */
 
+// ── Route middleware ──────────────────────────────────────────────────────────
+
+const validate = (req, res, next) => {
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(HTTP.BAD_REQUEST).json({
+      success: false,
+      message: ERR.VALIDATION_FAILED,
+      data: null,
+      errors: errors.array().map((e) => ({ field: e.path, message: e.msg })),
+    });
+  }
+
+  next();
+};
+
+// ── Error handler path (next(err)) ───────────────────────────────────────────
+
 const isValidationError = (err) =>
-  err.type === "validation" || err.name === "ValidationError";
+  err.type === 'validation' || err.name === 'ValidationError';
 
 const handleValidationError = (err) => ({
   status: HTTP.BAD_REQUEST,
@@ -23,4 +54,4 @@ const handleValidationError = (err) => ({
     : null,
 });
 
-module.exports = { isValidationError, handleValidationError };
+module.exports = { validate, isValidationError, handleValidationError };

@@ -1,5 +1,6 @@
 const { HTTP, ERR } = require("../../constants");
 const AppError = require("./appError");
+const { validate, isValidationError, handleValidationError } = require("./validationError");
 const { isOrmError, handleOrmError } = require("./ormError");
 const { handleServerError } = require("./serverError");
 
@@ -57,6 +58,12 @@ const errorHandler = (err, req, res, next) => {
     });
   }
 
+  // Validation errors passed via next(err)
+  if (isValidationError(err)) {
+    const { status, payload, errors } = handleValidationError(err);
+    return renderOrJson(res, req, status, payload, errors);
+  }
+
   // ORM / Sequelize errors
   if (isOrmError(err)) {
     const { status, payload, errors } = handleOrmError(err);
@@ -72,6 +79,9 @@ const errorHandler = (err, req, res, next) => {
 
 module.exports = {
   AppError,
+  validate,
+  isValidationError,
+  handleValidationError,
   isOrmError,
   handleOrmError,
   handleServerError,
