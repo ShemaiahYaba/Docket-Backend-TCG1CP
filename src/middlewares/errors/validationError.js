@@ -1,7 +1,5 @@
-'use strict';
-
-const { validationResult } = require('express-validator');
-const { HTTP, ERR } = require('../../constants');
+import { validationResult } from 'express-validator';
+import { HTTP, ERR } from '../../constants/index.js';
 
 /**
  * Validation — single source of truth for all validation error handling.
@@ -13,7 +11,7 @@ const { HTTP, ERR } = require('../../constants');
  *     with 400 if any exist.
  *
  *     Usage in routes:
- *       const { validate } = require('../middlewares/errors');
+ *       import { validate } from '../middlewares/errors/index.js';
  *       router.post('/clients', authMiddleware, [...rules], validate, controller);
  *
  *  2. `isValidationError` / `handleValidationError` — used by the global errorHandler
@@ -54,4 +52,4 @@ const handleValidationError = (err) => ({
     : null,
 });
 
-module.exports = { validate, isValidationError, handleValidationError };
+export { validate, isValidationError, handleValidationError };

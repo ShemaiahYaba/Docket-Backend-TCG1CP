@@ -1,8 +1,6 @@
-'use strict';
+import { DataTypes } from 'sequelize';
 
-const { DataTypes } = require('sequelize');
-
-module.exports = (sequelize) => {
+export default (sequelize) => {
   const Hearing = sequelize.define(
     'Hearing',
     {

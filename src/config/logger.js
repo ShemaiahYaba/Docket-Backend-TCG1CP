@@ -1,11 +1,11 @@
-const settings = require("./settings");
+import settings from './settings.js';
 
 /**
  * Server startup log.
  * Pass as the callback to app.listen() in app.js.
  *
  * Usage:
- *   const { logServerStart } = require('./config/logger');
+ *   import { logServerStart } from './config/logger.js';
  *   app.listen(settings.port, logServerStart);
  */
 const logServerStart = () => {
@@ -18,4 +18,4 @@ const logServerStart = () => {
   console.log("");
 };
 
-module.exports = { logServerStart };
+export { logServerStart };

@@ -1,11 +1,9 @@
-'use strict';
-
 /**
  * API Response Utilities
  * Standardizes all success responses to the established shape: { success, message, data }
  *
  * Usage:
- *   const { sendSuccess, sendCreated, sendNoContent } = require('../utils/apiResponse');
+ *   import { sendSuccess, sendCreated, sendNoContent } from '../utils/apiResponse.js';
  *
  *   sendSuccess(res, lawyers, 'Lawyers retrieved');
  *   sendCreated(res, newCase, 'Case created');
@@ -20,4 +18,4 @@ const sendCreated = (res, data, message = 'Created successfully') =>
 
 const sendNoContent = (res) => res.status(204).send();
 
-module.exports = { sendSuccess, sendCreated, sendNoContent };
+export { sendSuccess, sendCreated, sendNoContent };

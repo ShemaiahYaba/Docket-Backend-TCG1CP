@@ -1,10 +1,10 @@
-require("dotenv").config();
+import 'dotenv/config';
 
 /**
  * Central settings / environment config.
  * Every module reads from here — no module should call process.env directly.
  */
-module.exports = {
+export default {
   port: parseInt(process.env.PORT, 10) || 5000,
   nodeEnv: process.env.NODE_ENV || "development",
   isDev: (process.env.NODE_ENV || "development") === "development",

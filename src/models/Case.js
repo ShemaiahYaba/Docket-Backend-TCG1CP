@@ -1,9 +1,7 @@
-'use strict';
+import { DataTypes } from 'sequelize';
+import { CASE_STATUS, CASE_TYPE } from '../constants/index.js';
 
-const { DataTypes } = require('sequelize');
-const { CASE_STATUS, CASE_TYPE } = require('../constants');
-
-module.exports = (sequelize) => {
+export default (sequelize) => {
   const Case = sequelize.define(
     'Case',
     {

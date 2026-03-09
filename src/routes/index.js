@@ -1,4 +1,4 @@
-const { Router } = require("express");
+import { Router } from 'express';
 
 const router = Router();
 
@@ -39,11 +39,17 @@ router.get("/health", (req, res) => {
 // ─── Module Routes ────────────────────────────────────────────────────────────
 // Uncomment each line as the corresponding module is built and merged.
 
-// router.use('/auth',      require('./authRoutes'));
-// router.use('/lawyers',   require('./lawyerRoutes'));
-// router.use('/clients',   require('./clientRoutes'));
-// router.use('/cases',     require('./caseRoutes'));
-// router.use('/hearings',  require('./hearingRoutes'));
-// router.use('/dashboard', require('./dashboardRoutes'));
+// import authRoutes from './authRoutes.js';
+// import lawyerRoutes from './lawyerRoutes.js';
+// import clientRoutes from './clientRoutes.js';
+// import caseRoutes from './caseRoutes.js';
+// import hearingRoutes from './hearingRoutes.js';
+// import dashboardRoutes from './dashboardRoutes.js';
+// router.use('/auth',      authRoutes);
+// router.use('/lawyers',   lawyerRoutes);
+// router.use('/clients',   clientRoutes);
+// router.use('/cases',     caseRoutes);
+// router.use('/hearings',  hearingRoutes);
+// router.use('/dashboard', dashboardRoutes);
 
-module.exports = router;
+export default router;

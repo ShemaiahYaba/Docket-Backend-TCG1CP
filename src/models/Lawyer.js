@@ -1,9 +1,7 @@
-'use strict';
+import { DataTypes } from 'sequelize';
+import { ROLES } from '../constants/index.js';
 
-const { DataTypes } = require('sequelize');
-const { ROLES } = require('../constants');
-
-module.exports = (sequelize) => {
+export default (sequelize) => {
   const Lawyer = sequelize.define(
     'Lawyer',
     {

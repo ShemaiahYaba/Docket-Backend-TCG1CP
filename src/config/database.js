@@ -1,6 +1,6 @@
-const settings = require("./settings");
+import settings from './settings.js';
 
-module.exports = {
+export default {
   development: {
     username: settings.db.user,
     password: settings.db.password,

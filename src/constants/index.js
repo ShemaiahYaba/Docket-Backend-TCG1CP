@@ -3,9 +3,9 @@
  * Import from here instead of the individual files.
  *
  * Usage:
- *   const { ROLES, HTTP, ERR } = require('../constants');
+ *   import { ROLES, HTTP, ERR } from '../constants/index.js';
  */
-const types = require("./types");
-const { HTTP, ERR } = require("./errorCodes");
+import { ROLES, CASE_STATUS, CASE_TYPE, CLIENT_TYPE, URGENCY } from './types.js';
+import { HTTP, ERR } from './errorCodes.js';
 
-module.exports = { ...types, HTTP, ERR };
+export { ROLES, CASE_STATUS, CASE_TYPE, CLIENT_TYPE, URGENCY, HTTP, ERR };

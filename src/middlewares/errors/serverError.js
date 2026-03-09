@@ -1,4 +1,4 @@
-const { HTTP, ERR } = require("../../constants");
+import { HTTP, ERR } from '../../constants/index.js';
 
 /**
  * Server Error Handler
@@ -21,4 +21,4 @@ const handleServerError = (err) => {
   };
 };
 
-module.exports = { handleServerError };
+export { handleServerError };

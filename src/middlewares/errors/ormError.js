@@ -1,4 +1,4 @@
-const { HTTP, ERR } = require("../../constants");
+import { HTTP, ERR } from '../../constants/index.js';
 
 /**
  * ORM Error Handler (Sequelize)
@@ -54,4 +54,4 @@ const handleOrmError = (err) => {
   };
 };
 
-module.exports = { isOrmError, handleOrmError };
+export { isOrmError, handleOrmError };

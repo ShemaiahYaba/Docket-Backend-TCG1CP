@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * asyncHandler — wraps async controller functions so errors propagate to next(err).
  *
@@ -8,7 +6,7 @@
  * to the global errorHandler automatically — no try/catch needed in controllers.
  *
  * Usage in routes:
- *   const asyncHandler = require('../utils/asyncHandler');
+ *   import asyncHandler from '../utils/asyncHandler.js';
  *   router.get('/lawyers', authMiddleware, asyncHandler(getLawyers));
  *
  * Usage in controllers (no try/catch required):
@@ -20,4 +18,4 @@
 const asyncHandler = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
-module.exports = asyncHandler;
+export default asyncHandler;
