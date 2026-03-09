@@ -1,25 +1,28 @@
-'use strict';
+import { Sequelize } from 'sequelize';
+import settings from '../config/settings.js';
+import defineLawyer from './Lawyer.js';
+import defineClient from './Client.js';
+import defineCase from './Case.js';
+import defineHearing from './Hearing.js';
 
-const { Sequelize, DataTypes } = require('sequelize');
-const dbConfig = require('../config/database');
+const sequelize = new Sequelize(
+  settings.db.name,
+  settings.db.user,
+  settings.db.password,
+  {
+    host: settings.db.host,
+    port: settings.db.port,
+    dialect: 'mysql',
+    logging: false,
+  }
+);
 
-const env = process.env.NODE_ENV || 'development';
-const config = dbConfig[env];
+const Lawyer  = defineLawyer(sequelize);
+const Client  = defineClient(sequelize);
+const Case    = defineCase(sequelize);
+const Hearing = defineHearing(sequelize);
 
-const sequelize = new Sequelize(config.database, config.username, config.password, config);
+const models = { Lawyer, Client, Case, Hearing };
+Object.values(models).forEach((m) => m.associate && m.associate(models));
 
-const db = {};
-
-db.Lawyer  = require('./Lawyer')(sequelize, DataTypes);
-db.Client  = require('./Client')(sequelize, DataTypes);
-db.Case    = require('./Case')(sequelize, DataTypes);
-db.Hearing = require('./Hearing')(sequelize, DataTypes);
-
-Object.values(db).forEach((model) => {
-  if (model.associate) model.associate(db);
-});
-
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-module.exports = db;
+export { sequelize, Sequelize, Lawyer, Client, Case, Hearing };

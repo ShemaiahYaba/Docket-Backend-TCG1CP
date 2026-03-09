@@ -1,8 +1,8 @@
-const { HTTP, ERR } = require("../../constants");
-const AppError = require("./appError");
-const { validate, isValidationError, handleValidationError } = require("./validationError");
-const { isOrmError, handleOrmError } = require("./ormError");
-const { handleServerError } = require("./serverError");
+import { HTTP, ERR } from '../../constants/index.js';
+import AppError from './appError.js';
+import { validate, isValidationError, handleValidationError } from './validationError.js';
+import { isOrmError, handleOrmError } from './ormError.js';
+import { handleServerError } from './serverError.js';
 
 /**
  * Errors module — barrel export + Express middleware assembly.
@@ -77,7 +77,7 @@ const errorHandler = (err, req, res, next) => {
 
 // ─── Barrel ──────────────────────────────────────────────────────────────────
 
-module.exports = {
+export {
   AppError,
   validate,
   isValidationError,

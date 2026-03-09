@@ -1,9 +1,7 @@
-'use strict';
+import { DataTypes } from 'sequelize';
+import { CLIENT_TYPE } from '../constants/index.js';
 
-const { DataTypes } = require('sequelize');
-const { CLIENT_TYPE } = require('../constants');
-
-module.exports = (sequelize) => {
+export default (sequelize) => {
   const Client = sequelize.define(
     'Client',
     {

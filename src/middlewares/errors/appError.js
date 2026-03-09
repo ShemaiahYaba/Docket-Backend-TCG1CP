@@ -1,4 +1,4 @@
-const { HTTP } = require("../../constants");
+import { HTTP } from '../../constants/index.js';
 
 /**
  * AppError — operational (expected) errors thrown from controllers/services.
@@ -19,4 +19,4 @@ class AppError extends Error {
   }
 }
 
-module.exports = AppError;
+export default AppError;

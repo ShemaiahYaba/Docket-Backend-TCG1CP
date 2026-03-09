@@ -45,4 +45,4 @@ const ERR = {
   SERVER_ERROR: "An unexpected error occurred. Please try again.",
 };
 
-module.exports = { HTTP, ERR };
+export { HTTP, ERR };

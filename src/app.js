@@ -1,14 +1,18 @@
-const path = require("path");
-const express = require("express");
-const helmet = require("helmet");
-const morgan = require("morgan");
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import express from 'express';
+import helmet from 'helmet';
+import morgan from 'morgan';
 
-const settings = require("./config/settings");
-const corsMiddleware = require("./config/cors");
-const { logServerStart } = require("./config/logger");
-const { swaggerUi, swaggerSpec } = require("./config/swagger");
-const routes = require("./routes");
-const { notFoundHandler, errorHandler } = require("./middlewares/errors");
+import settings from './config/settings.js';
+import corsMiddleware from './config/cors.js';
+import { logServerStart } from './config/logger.js';
+import { swaggerUi, swaggerSpec } from './config/swagger.js';
+import routes from './routes/index.js';
+import { notFoundHandler, errorHandler } from './middlewares/errors/index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // ─────────────────────────────────────────────────────────────────────────────
 const app = express();
@@ -23,7 +27,7 @@ app.use(express.json());
 
 // Template engine
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "..", "templates"));
+app.set("views", join(__dirname, "..", "templates"));
 
 // Root redirect → /api/docs
 app.get("/", (req, res) => res.redirect("/api/docs"));
@@ -41,4 +45,4 @@ app.use(errorHandler);
 // ─────────────────────────────────────────────────────────────────────────────
 app.listen(settings.port, logServerStart);
 
-module.exports = app;
+export default app;

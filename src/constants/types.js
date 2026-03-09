@@ -36,4 +36,4 @@ const URGENCY = {
   GREEN: "green",
 };
 
-module.exports = { ROLES, CASE_STATUS, CASE_TYPE, CLIENT_TYPE, URGENCY };
+export { ROLES, CASE_STATUS, CASE_TYPE, CLIENT_TYPE, URGENCY };
