@@ -1,0 +1,1 @@
+router.get("/:id/hearings", hearingController.getCaseHearings);
