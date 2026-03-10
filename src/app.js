@@ -10,6 +10,7 @@ import { logServerStart } from './config/logger.js';
 import { swaggerUi, swaggerSpec } from './config/swagger.js';
 import routes from './routes/index.js';
 import { notFoundHandler, errorHandler } from './middlewares/errors/index.js';
+import { lawyerRoutes } from './routes/lawyerRoutes.js';  
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -37,6 +38,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use("/api", routes);
+app.use("/api/lawyers", lawyerRoutes); // Mount lawyer routes under /api/lawyers
 
 // Error handling (order matters — 404 before global handler)
 app.use(notFoundHandler);
