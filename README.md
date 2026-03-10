@@ -236,16 +236,28 @@ Authorization: Bearer <token>
 | POST | /auth/login | No | Login and get JWT |
 | POST | /auth/logout | Yes | Logout |
 | GET | /auth/me | Yes | Get current user |
+
+#### lawyers Endpoints 
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | /lawyers | Yes | List all lawyers |
 | POST | /lawyers | Yes | Create lawyer |
 | GET | /lawyers/:id | Yes | Get lawyer by ID |
 | PUT | /lawyers/:id | Yes | Update lawyer |
 | PATCH | /lawyers/:id/deactivate | Yes | Deactivate lawyer |
+
+#### Clients Endpoints 
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | /clients | Yes | List all clients |
 | POST | /clients | Yes | Create client |
 | GET | /clients/:id | Yes | Get client by ID |
 | PUT | /clients/:id | Yes | Update client |
 | DELETE | /clients/:id | Yes | Delete client |
+
+#### Cases Endpoints 
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | /cases | Yes | List cases |
 | POST | /cases | Yes | Create case |
 | GET | /cases/:id | Yes | Get case by ID |
@@ -254,11 +266,19 @@ Authorization: Bearer <token>
 | PATCH | /cases/:id/assign | Yes | Assign lawyer |
 | PATCH | /cases/:id/status | Yes | Update status |
 | GET | /cases/:id/hearings | Yes | Get case hearings |
+
+#### Hearings Endpoints 
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | /hearings | Yes | List hearings |
 | POST | /hearings | Yes | Schedule hearing |
 | GET | /hearings/:id | Yes | Get hearing by ID |
 | PUT | /hearings/:id | Yes | Update hearing |
 | DELETE | /hearings/:id | Yes | Delete hearing |
+
+#### Dashboard Endpoints 
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
 | GET | /dashboard/stats | Yes | Case statistics |
 | GET | /dashboard/upcoming-hearings | Yes | Next 10 hearings |
 | GET | /dashboard/recent-cases | Yes | Last 10 cases |
