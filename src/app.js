@@ -11,6 +11,7 @@ import { swaggerUi, swaggerSpec } from './config/swagger.js';
 import routes from './routes/index.js';
 import { notFoundHandler, errorHandler } from './middlewares/errors/index.js';
 import { lawyerRoutes } from './routes/lawyerRoutes.js';  
+import { ValidationError } from 'sequelize';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

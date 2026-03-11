@@ -11,7 +11,7 @@ import {
 } from "../controllers/lawyerController.js";
 
 import{authMiddleware, roleMiddleware} from '../middlewares/authMiddleware.js';
-
+import { validate } from '../middlewares/validationMiddleware.js';
 
 import { ROLES } from '../constants/index.js';
 
@@ -93,27 +93,27 @@ router.get("/lawyers", getAllLawyers);
 
 // @route   GET /api/lawyers/:id
 // @desc    Get a single lawyer by ID (Senior partners can see all, others can only see themselves)
-router.get("/lawyers/:id", idValidation, getLawyerById);
+router.get("/lawyers/:id", idValidation, validate, getLawyerById);
 
 
 // @route   POST /api/lawyers
 // @desc    Create a new lawyer (Only senior partners can create lawyers)
-router.post("/lawyers", roleMiddleware(ROLES.SENIOR_PARTNER), createLawyerValidation, createLawyer);
+router.post("/lawyers", roleMiddleware(ROLES.SENIOR_PARTNER), createLawyerValidation,validate, createLawyer);
 
 
 // @route   PUT /api/lawyers/:id
 // @desc    Update a lawyer (Senior partners can update all, others can only update themselves)
-router.put("/lawyers/:id", roleMiddleware(ROLES.SENIOR_PARTNER), updateLawyerValidation, updateLawyer);
+router.put("/lawyers/:id", roleMiddleware(ROLES.SENIOR_PARTNER), updateLawyerValidation,validate, updateLawyer);
 
 
 // @route   DEACTIVATE /api/lawyers/:id/deactivate
 // @desc    Deactivate a lawyer (Senior partners can deactivate all, others can only deactivate themselves)
-router.patch("/lawyers/:id/deactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, deactivateLawyer);
+router.patch("/lawyers/:id/deactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, validate, deactivateLawyer);
 
 
 // @route REACTIVATE /api/lawyers/:id/reactivate
 // @desc Reactivate a lawyer (Senior partners can reactivate all, others can only reactivate themselves)
-router.patch("/lawyers/:id/reactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, reactivateLawyer);
+router.patch("/lawyers/:id/reactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, validate, reactivateLawyer);
 
 
 export const lawyerRoutes = router;
