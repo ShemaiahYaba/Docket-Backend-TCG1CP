@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import { Client, Case } from '../models/index.js';
 import { HTTP, ERR } from '../constants/index.js';
+import { renderOrJson } from '../middlewares/errors/index.js';
 
 // Get all clients
 // @route   GET /api/clients
@@ -23,7 +24,7 @@ export const getAllClients = async (req, res, next) => {
       order: [['full_name', 'ASC']],
     });
 
-    res.status(HTTP.OK).json({
+    renderOrJson(res, req, HTTP.OK, {
       success: true,
       count: clients.length,
       data: clients,
@@ -45,14 +46,14 @@ export const getClientById = async (req, res, next) => {
     });
 
     if (!client) {
-      return res.status(HTTP.NOT_FOUND).json({
+      return renderOrJson(res, req, HTTP.NOT_FOUND, {
         success: false,
         message: 'Client not found',
         data: null,
       });
     }
 
-    res.status(HTTP.OK).json({
+    renderOrJson(res, req, HTTP.OK, {
       success: true,
       data: client,
     });
@@ -70,7 +71,7 @@ export const createClient = async (req, res, next) => {
 
     const existing = await Client.findOne({ where: { email } });
     if (existing) {
-      return res.status(HTTP.CONFLICT).json({
+      return renderOrJson(res, req, HTTP.CONFLICT, {
         success: false,
         message: 'A client with this email already exists',
         data: null,
@@ -79,7 +80,7 @@ export const createClient = async (req, res, next) => {
 
     const client = await Client.create({ full_name, email, phone, address, client_type });
 
-    res.status(HTTP.CREATED).json({
+    renderOrJson(res, req, HTTP.CREATED, {
       success: true,
       message: 'Client created successfully',
       data: client,
@@ -98,7 +99,7 @@ export const updateClient = async (req, res, next) => {
 
     const client = await Client.findByPk(id);
     if (!client) {
-      return res.status(HTTP.NOT_FOUND).json({
+      return renderOrJson(res, req, HTTP.NOT_FOUND, {
         success: false,
         message: 'Client not found',
         data: null,
@@ -111,7 +112,7 @@ export const updateClient = async (req, res, next) => {
     if (email && email !== client.email) {
       const emailTaken = await Client.findOne({ where: { email } });
       if (emailTaken) {
-        return res.status(HTTP.CONFLICT).json({
+        return renderOrJson(res, req, HTTP.CONFLICT, {
           success: false,
           message: 'A client with this email already exists',
           data: null,
@@ -127,7 +128,7 @@ export const updateClient = async (req, res, next) => {
       client_type: client_type !== undefined ? client_type : client.client_type,
     });
 
-    res.status(HTTP.OK).json({
+    renderOrJson(res, req, HTTP.OK, {
       success: true,
       message: 'Client updated successfully',
       data: client,
@@ -146,7 +147,7 @@ export const deleteClient = async (req, res, next) => {
 
     const client = await Client.findByPk(id);
     if (!client) {
-      return res.status(HTTP.NOT_FOUND).json({
+      return renderOrJson(res, req, HTTP.NOT_FOUND, {
         success: false,
         message: 'Client not found',
         data: null,
@@ -155,7 +156,7 @@ export const deleteClient = async (req, res, next) => {
 
     await client.destroy();
 
-    res.status(HTTP.OK).json({
+    renderOrJson(res, req, HTTP.OK, {
       success: true,
       message: 'Client deleted successfully',
       data: null,

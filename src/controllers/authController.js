@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { Lawyer } from '../models/index.js';
 import settings from '../config/settings.js';
 import { HTTP, ERR } from '../constants/index.js';
+import { renderOrJson } from '../middlewares/errors/index.js';
 
 // Register a new lawyer account
 // POST /api/auth/register
@@ -12,7 +13,7 @@ export const register = async (req, res, next) => {
 
     const existing = await Lawyer.findOne({ where: { email } });
     if (existing) {
-      return res.status(HTTP.CONFLICT).json({ success: false, message: 'An account with this email already exists', data: null });
+      return renderOrJson(res, req, HTTP.CONFLICT, { success: false, message: 'An account with this email already exists', data: null });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -24,7 +25,7 @@ export const register = async (req, res, next) => {
       { expiresIn: settings.jwt.expiresIn }
     );
 
-    res.status(HTTP.CREATED).json({
+    renderOrJson(res, req, HTTP.CREATED, {
       success: true,
       message: 'Account created successfully',
       data: {
@@ -50,16 +51,16 @@ export const login = async (req, res, next) => {
 
     const lawyer = await Lawyer.scope('withPassword').findOne({ where: { email } });
     if (!lawyer) {
-      return res.status(HTTP.UNAUTHORIZED).json({ success: false, message: ERR.INVALID_CREDENTIALS, data: null });
+      return renderOrJson(res, req, HTTP.UNAUTHORIZED, { success: false, message: ERR.INVALID_CREDENTIALS, data: null });
     }
 
     const isMatch = await bcrypt.compare(password, lawyer.password);
     if (!isMatch) {
-      return res.status(HTTP.UNAUTHORIZED).json({ success: false, message: ERR.INVALID_CREDENTIALS, data: null });
+      return renderOrJson(res, req, HTTP.UNAUTHORIZED, { success: false, message: ERR.INVALID_CREDENTIALS, data: null });
     }
 
     if (!lawyer.is_active) {
-      return res.status(HTTP.UNAUTHORIZED).json({ success: false, message: ERR.ACCOUNT_INACTIVE, data: null });
+      return renderOrJson(res, req, HTTP.UNAUTHORIZED, { success: false, message: ERR.ACCOUNT_INACTIVE, data: null });
     }
 
     const token = jwt.sign(
@@ -68,7 +69,7 @@ export const login = async (req, res, next) => {
       { expiresIn: settings.jwt.expiresIn }
     );
 
-    res.status(HTTP.OK).json({
+    renderOrJson(res, req, HTTP.OK, {
       success: true,
       message: 'Login successful',
       data: {
@@ -88,8 +89,8 @@ export const login = async (req, res, next) => {
 
 // Logout
 // POST /api/auth/logout
-export const logout = (_req, res) => {
-  res.status(HTTP.OK).json({ success: true, message: 'Logged out successfully', data: null });
+export const logout = (req, res) => {
+  renderOrJson(res, req, HTTP.OK, { success: true, message: 'Logged out successfully', data: null });
 };
 
 // Get current authenticated user
@@ -98,9 +99,9 @@ export const me = async (req, res, next) => {
   try {
     const lawyer = await Lawyer.findByPk(req.user.id);
     if (!lawyer) {
-      return res.status(HTTP.NOT_FOUND).json({ success: false, message: ERR.NOT_FOUND, data: null });
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: ERR.NOT_FOUND, data: null });
     }
-    res.status(HTTP.OK).json({ success: true, data: lawyer });
+    renderOrJson(res, req, HTTP.OK, { success: true, data: lawyer });
   } catch (error) {
     next(error);
   }

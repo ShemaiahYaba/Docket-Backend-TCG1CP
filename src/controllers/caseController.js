@@ -1,5 +1,6 @@
 import { Case, Hearing } from '../models/index.js';
 import { HTTP, ERR, ROLES } from '../constants/index.js';
+import { renderOrJson } from '../middlewares/errors/index.js';
 
 // Generate next SLT-XXX case ID
 const generateCaseId = async () => {
@@ -14,7 +15,7 @@ export const createCase = async (req, res, next) => {
     const { title, description, case_type, status, client_id, lawyer_id, filed_date } = req.body;
     const id = await generateCaseId();
     const newCase = await Case.create({ id, title, description, case_type, status, client_id, lawyer_id, filed_date });
-    return res.status(HTTP.CREATED).json({ success: true, message: 'Case created successfully', data: newCase });
+    return renderOrJson(res, req, HTTP.CREATED, { success: true, message: 'Case created successfully', data: newCase });
   } catch (error) {
     next(error);
   }
@@ -35,7 +36,7 @@ export const getAllCases = async (req, res, next) => {
     }
 
     const cases = await Case.findAll({ where: whereClause });
-    return res.status(HTTP.OK).json({ success: true, count: cases.length, data: cases });
+    return renderOrJson(res, req, HTTP.OK, { success: true, count: cases.length, data: cases });
   } catch (error) {
     next(error);
   }
@@ -47,9 +48,9 @@ export const getCaseById = async (req, res, next) => {
   try {
     const caseItem = await Case.findByPk(req.params.id);
     if (!caseItem) {
-      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
     }
-    return res.status(HTTP.OK).json({ success: true, data: caseItem });
+    return renderOrJson(res, req, HTTP.OK, { success: true, data: caseItem });
   } catch (error) {
     next(error);
   }
@@ -61,11 +62,11 @@ export const updateCase = async (req, res, next) => {
   try {
     const caseItem = await Case.findByPk(req.params.id);
     if (!caseItem) {
-      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
     }
     const { title, description, case_type, client_id, lawyer_id, filed_date, closed_date } = req.body;
     await caseItem.update({ title, description, case_type, client_id, lawyer_id, filed_date, closed_date });
-    return res.status(HTTP.OK).json({ success: true, message: 'Case updated successfully', data: caseItem });
+    return renderOrJson(res, req, HTTP.OK, { success: true, message: 'Case updated successfully', data: caseItem });
   } catch (error) {
     next(error);
   }
@@ -77,10 +78,10 @@ export const deleteCase = async (req, res, next) => {
   try {
     const caseItem = await Case.findByPk(req.params.id);
     if (!caseItem) {
-      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
     }
     await caseItem.destroy();
-    return res.status(HTTP.OK).json({ success: true, message: 'Case deleted successfully', data: null });
+    return renderOrJson(res, req, HTTP.OK, { success: true, message: 'Case deleted successfully', data: null });
   } catch (error) {
     next(error);
   }
@@ -92,11 +93,11 @@ export const assignLawyer = async (req, res, next) => {
   try {
     const caseItem = await Case.findByPk(req.params.id);
     if (!caseItem) {
-      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
     }
     const { lawyer_id } = req.body;
     await caseItem.update({ lawyer_id });
-    return res.status(HTTP.OK).json({ success: true, message: 'Lawyer assigned successfully', data: caseItem });
+    return renderOrJson(res, req, HTTP.OK, { success: true, message: 'Lawyer assigned successfully', data: caseItem });
   } catch (error) {
     next(error);
   }
@@ -108,11 +109,11 @@ export const updateCaseStatus = async (req, res, next) => {
   try {
     const caseItem = await Case.findByPk(req.params.id);
     if (!caseItem) {
-      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
     }
     const { status } = req.body;
     await caseItem.update({ status });
-    return res.status(HTTP.OK).json({ success: true, message: 'Case status updated', data: caseItem });
+    return renderOrJson(res, req, HTTP.OK, { success: true, message: 'Case status updated', data: caseItem });
   } catch (error) {
     next(error);
   }
@@ -126,9 +127,9 @@ export const getCaseHearings = async (req, res, next) => {
       include: [{ model: Hearing, as: 'hearings' }],
     });
     if (!caseItem) {
-      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
     }
-    return res.status(HTTP.OK).json({ success: true, count: caseItem.hearings.length, data: caseItem.hearings });
+    return renderOrJson(res, req, HTTP.OK, { success: true, count: caseItem.hearings.length, data: caseItem.hearings });
   } catch (error) {
     next(error);
   }
