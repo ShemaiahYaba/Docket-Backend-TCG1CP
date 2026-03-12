@@ -1,5 +1,5 @@
-import { Case, Hearing } from '../models/index.js';
-import { HTTP, ERR, ROLES } from '../constants/index.js';
+import { Case, Hearing, Lawyer, Client } from '../models/index.js';
+import { HTTP, ERR, ROLES, CASE_TYPE } from '../constants/index.js';
 import { renderOrJson } from '../middlewares/errors/index.js';
 
 // Generate next SLT-XXX case ID
@@ -42,11 +42,60 @@ export const getAllCases = async (req, res, next) => {
   }
 };
 
-// Get a case by ID
+// Get all valid case types
+// GET /api/cases/types
+export const getCaseTypes = (req, res) => {
+  return renderOrJson(res, req, HTTP.OK, { success: true, data: Object.values(CASE_TYPE) });
+};
+
+// Get recent cases (last 10 by updated_at)
+// GET /api/cases/recent
+export const getRecentCases = async (req, res, next) => {
+  try {
+    const whereClause = {};
+    if (req.user.role === ROLES.ASSOCIATE) {
+      whereClause.lawyer_id = req.user.id;
+    }
+    const cases = await Case.findAll({
+      where: whereClause,
+      order: [['updated_at', 'DESC']],
+      limit: 10,
+      include: [
+        { model: Client, as: 'client', attributes: ['id', 'full_name', 'email'] },
+        { model: Lawyer, as: 'lawyer', attributes: ['id', 'full_name', 'specialty'] },
+      ],
+    });
+    return renderOrJson(res, req, HTTP.OK, { success: true, count: cases.length, data: cases });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get a case by ID (basic)
 // GET /api/cases/:id
 export const getCaseById = async (req, res, next) => {
   try {
     const caseItem = await Case.findByPk(req.params.id);
+    if (!caseItem) {
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
+    }
+    return renderOrJson(res, req, HTTP.OK, { success: true, data: caseItem });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get full case detail with associations
+// GET /api/cases/:id/detail
+export const getCaseDetail = async (req, res, next) => {
+  try {
+    const caseItem = await Case.findByPk(req.params.id, {
+      include: [
+        { model: Client, as: 'client', attributes: ['id', 'full_name', 'email', 'phone'] },
+        { model: Lawyer, as: 'lawyer', attributes: ['id', 'full_name', 'email', 'specialty'] },
+        { model: Hearing, as: 'hearings' },
+      ],
+    });
     if (!caseItem) {
       return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: 'Case not found', data: null });
     }

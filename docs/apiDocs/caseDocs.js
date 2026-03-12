@@ -49,6 +49,42 @@
  *           type: string
  *           format: date-time
  *
+ *     CaseDetail:
+ *       allOf:
+ *         - $ref: '#/components/schemas/Case'
+ *         - type: object
+ *           properties:
+ *             client:
+ *               type: object
+ *               nullable: true
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 full_name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *             lawyer:
+ *               type: object
+ *               nullable: true
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   format: uuid
+ *                 full_name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 specialty:
+ *                   type: string
+ *             hearings:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Hearing'
+ *
  *     CaseResponse:
  *       type: object
  *       properties:
@@ -57,6 +93,15 @@
  *           example: true
  *         data:
  *           $ref: '#/components/schemas/Case'
+ *
+ *     CaseDetailResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         data:
+ *           $ref: '#/components/schemas/CaseDetail'
  *
  *     CasesListResponse:
  *       type: object
@@ -71,6 +116,18 @@
  *           type: array
  *           items:
  *             $ref: '#/components/schemas/Case'
+ *
+ *     CaseTypesResponse:
+ *       type: object
+ *       properties:
+ *         success:
+ *           type: boolean
+ *           example: true
+ *         data:
+ *           type: array
+ *           items:
+ *             type: string
+ *           example: [Civil, Criminal, Corporate, Family, Property]
  */
 
 /**
@@ -172,9 +229,53 @@
 
 /**
  * @swagger
+ * /cases/types:
+ *   get:
+ *     summary: Get all valid case types
+ *     description: Returns the list of allowed case_type enum values.
+ *     tags: [Cases]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of case types
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CaseTypesResponse'
+ *       401:
+ *         description: Authentication required
+ */
+
+/**
+ * @swagger
+ * /cases/recent:
+ *   get:
+ *     summary: Get recently updated cases
+ *     description: >
+ *       Returns the last 10 cases ordered by `updated_at` descending.
+ *       Associates only see cases assigned to them.
+ *       Includes nested client and lawyer details.
+ *     tags: [Cases]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of recent cases
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CasesListResponse'
+ *       401:
+ *         description: Authentication required
+ */
+
+/**
+ * @swagger
  * /cases/{id}:
  *   get:
  *     summary: Get a case by ID
+ *     description: Returns basic case fields only. Use `/cases/{id}/detail` for nested associations.
  *     tags: [Cases]
  *     security:
  *       - bearerAuth: []
@@ -187,7 +288,7 @@
  *         example: "SLT-001"
  *     responses:
  *       200:
- *         description: Case details
+ *         description: Case data
  *         content:
  *           application/json:
  *             schema:
@@ -268,6 +369,35 @@
  *         description: Authentication required
  *       403:
  *         description: Forbidden — senior_partner only
+ *       404:
+ *         description: Case not found
+ */
+
+/**
+ * @swagger
+ * /cases/{id}/detail:
+ *   get:
+ *     summary: Get full case detail
+ *     description: Returns the case with nested client, assigned lawyer, and all hearings.
+ *     tags: [Cases]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: "SLT-001"
+ *     responses:
+ *       200:
+ *         description: Full case details with associations
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CaseDetailResponse'
+ *       401:
+ *         description: Authentication required
  *       404:
  *         description: Case not found
  */
