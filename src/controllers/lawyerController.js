@@ -1,4 +1,4 @@
-import Lawyer from "../models/Lawyer.js";
+import { Lawyer } from '../models/index.js';
 import bcrypt from "bcrypt";
 import { HTTP, ERR } from '../constants/errorCodes.js';
 import { renderOrJson } from '../middlewares/errors/index.js';
@@ -67,7 +67,7 @@ export const getLawyerById = async (req, res, next) => {
 // @route   POST /api/lawyers
 export const createLawyer = async (req, res, next) => {
   try {
-    const { full_name, email, password, role, phone, speciality } = req.body;
+    const { full_name, email, password, role, phone, specialty } = req.body;
 
     const existingLawyer = await Lawyer.findOne({ where: { email } });
     if (existingLawyer) {
@@ -80,7 +80,7 @@ export const createLawyer = async (req, res, next) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newLawyer = await Lawyer.create({
-      full_name, email, password: hashedPassword, role, phone, speciality, is_active: true,
+      full_name, email, password: hashedPassword, role, phone, specialty, is_active: true,
     });
 
     renderOrJson(res, req, HTTP.CREATED, {
@@ -108,12 +108,12 @@ export const updateLawyer = async (req, res, next) => {
       });
     }
 
-    const { full_name, role, phone, speciality } = req.body;
+    const { full_name, role, phone, specialty } = req.body;
     await lawyer.update({
       full_name:  full_name  || lawyer.full_name,
       role:       role       || lawyer.role,
       phone:      phone      !== undefined ? phone      : lawyer.phone,
-      speciality: speciality || lawyer.speciality,
+      specialty: specialty || lawyer.specialty,
     });
 
     renderOrJson(res, req, HTTP.OK, {

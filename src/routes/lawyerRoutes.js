@@ -45,7 +45,7 @@ const createLawyerValidation = [
     .optional()
     .isMobilePhone("any")
     .withMessage("Please provide a valid phone number"),
-  body("speciality")
+  body("specialty")
     .notEmpty()
     .withMessage("Specialty is required")
     .isLength({ max: 100 })
