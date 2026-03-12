@@ -10,6 +10,7 @@ import { logServerStart } from './config/logger.js';
 import { swaggerUi, swaggerSpec } from './config/swagger.js';
 import routes from './routes/index.js';
 import { notFoundHandler, errorHandler } from './middlewares/errors/index.js';
+import { startCronJobs } from './services/cronService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -43,6 +44,9 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // ─────────────────────────────────────────────────────────────────────────────
-app.listen(settings.port, logServerStart);
+app.listen(settings.port, () => {
+  logServerStart();
+  startCronJobs();
+});
 
 export default app;

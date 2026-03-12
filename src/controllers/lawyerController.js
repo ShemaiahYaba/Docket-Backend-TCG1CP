@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { HTTP, ERR } from '../constants/errorCodes.js';
 import { renderOrJson } from '../middlewares/errors/index.js';
 import { ROLES } from "../constants/index.js";
+import { sendWelcomeEmail } from '../services/emailService.js';
 
 // Get all lawyers
 // @route   GET /api/lawyers
@@ -82,6 +83,8 @@ export const createLawyer = async (req, res, next) => {
     const newLawyer = await Lawyer.create({
       full_name, email, password: hashedPassword, role, phone, specialty, is_active: true,
     });
+
+    sendWelcomeEmail(newLawyer);
 
     renderOrJson(res, req, HTTP.CREATED, {
       success: true,
