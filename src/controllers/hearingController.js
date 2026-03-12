@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import { Hearing, Case, Lawyer } from '../models/index.js';
 import { HTTP } from '../constants/index.js';
 import { renderOrJson } from '../middlewares/errors/index.js';
-import { sendHearingConfirmationEmail } from '../services/emailService.js';
+import { sendHearingConfirmationEmail } from '../services/email/index.js';
 
 // Create new hearing
 // POST /api/hearings

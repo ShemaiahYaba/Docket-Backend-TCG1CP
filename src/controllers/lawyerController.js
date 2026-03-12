@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import { HTTP, ERR } from '../constants/errorCodes.js';
 import { renderOrJson } from '../middlewares/errors/index.js';
 import { ROLES } from "../constants/index.js";
-import { sendWelcomeEmail } from '../services/emailService.js';
+import { sendWelcomeEmail } from '../services/email/index.js';
 
 // Get all lawyers
 // @route   GET /api/lawyers

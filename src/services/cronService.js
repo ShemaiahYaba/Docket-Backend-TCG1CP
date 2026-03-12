@@ -1,7 +1,7 @@
 import cron from 'node-cron';
 import { Op } from 'sequelize';
 import { Hearing, Case, Lawyer } from '../models/index.js';
-import { sendHearingAlertEmail } from './emailService.js';
+import { sendHearingAlertEmail } from './email/index.js';
 import { ROLES } from '../constants/index.js';
 
 /**
