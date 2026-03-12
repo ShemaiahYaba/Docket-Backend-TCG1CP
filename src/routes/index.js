@@ -41,13 +41,13 @@ router.get("/health", (req, res) => {
 
 // import authRoutes from './authRoutes.js';
 // import lawyerRoutes from './lawyerRoutes.js';
-// import clientRoutes from './clientRoutes.js';
+import clientRoutes from './clientRoutes.js';
 // import caseRoutes from './caseRoutes.js';
 // import hearingRoutes from './hearingRoutes.js';
 // import dashboardRoutes from './dashboardRoutes.js';
 // router.use('/auth',      authRoutes);
 // router.use('/lawyers',   lawyerRoutes);
-// router.use('/clients',   clientRoutes);
+router.use('/clients',   clientRoutes);
 // router.use('/cases',     caseRoutes);
 // router.use('/hearings',  hearingRoutes);
 // router.use('/dashboard', dashboardRoutes);
