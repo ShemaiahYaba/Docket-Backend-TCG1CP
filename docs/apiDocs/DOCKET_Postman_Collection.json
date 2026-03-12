@@ -34,6 +34,19 @@
       "name": "Auth",
       "item": [
         {
+          "name": "POST /auth/register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"full_name\": \"Amara Okafor\",\n  \"email\": \"amara@docket.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"associate\",\n  \"specialty\": \"Criminal Law\",\n  \"phone\": \"+2348031234567\"\n}"
+            },
+            "url": { "raw": "{{base_url}}/auth/register", "host": ["{{base_url}}"], "path": ["auth", "register"] },
+            "description": "Register a new lawyer account. Open endpoint — no auth required."
+          }
+        },
+        {
           "name": "Login — Senior Partner",
           "event": [
             {
@@ -335,6 +348,22 @@
           }
         },
         {
+          "name": "GET /cases/types",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases/types", "host": ["{{base_url}}"], "path": ["cases", "types"] },
+            "description": "Get all valid case type enum values (Civil, Criminal, Corporate, Family, Property)."
+          }
+        },
+        {
+          "name": "GET /cases/recent",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases/recent", "host": ["{{base_url}}"], "path": ["cases", "recent"] },
+            "description": "Get the 10 most recently updated cases sorted by updated_at descending."
+          }
+        },
+        {
           "name": "POST /cases — Create",
           "request": {
             "method": "POST",
@@ -361,11 +390,19 @@
           }
         },
         {
-          "name": "GET /cases/:id",
+          "name": "GET /cases/:id — Basic",
           "request": {
             "method": "GET",
             "url": { "raw": "{{base_url}}/cases/{{case_id}}", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}"] },
-            "description": "Get full case detail."
+            "description": "Get basic case data — no associations included."
+          }
+        },
+        {
+          "name": "GET /cases/:id/detail — Full Detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/cases/{{case_id}}/detail", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}", "detail"] },
+            "description": "Get full case detail including associated client, assigned lawyer, and all hearings."
           }
         },
         {
@@ -429,7 +466,7 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{\n  \"status\": \"Closed\"\n}" },
             "url": { "raw": "{{base_url}}/cases/{{case_id}}/status", "host": ["{{base_url}}"], "path": ["cases", "{{case_id}}", "status"] },
-            "description": "Close a case. closed_date should be set automatically."
+            "description": "Close a case. closed_date is set automatically."
           }
         },
         {
@@ -454,7 +491,15 @@
           }
         },
         {
-          "name": "GET /hearings — Upcoming",
+          "name": "GET /hearings/upcoming — Dedicated Route",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{base_url}}/hearings/upcoming", "host": ["{{base_url}}"], "path": ["hearings", "upcoming"] },
+            "description": "Get all future hearings sorted by date ascending. Dedicated route."
+          }
+        },
+        {
+          "name": "GET /hearings — Filter: upcoming",
           "request": {
             "method": "GET",
             "url": {
@@ -463,11 +508,11 @@
               "path": ["hearings"],
               "query": [{ "key": "filter", "value": "upcoming" }]
             },
-            "description": "Get all future hearings."
+            "description": "Get all future hearings via query param filter."
           }
         },
         {
-          "name": "GET /hearings — This Week",
+          "name": "GET /hearings — Filter: this_week",
           "request": {
             "method": "GET",
             "url": {
