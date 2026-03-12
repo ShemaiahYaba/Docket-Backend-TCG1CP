@@ -34,7 +34,7 @@
  *           example: "Corporate Law"
  *         role:
  *           type: string
- *           enum: [Senior Partner, Associate, Secretary]
+ *           enum: [senior_partner, associate, secretary]
  *           description: Lawyer's role in the firm
  *           example: "Associate"
  *         is_active:
@@ -91,7 +91,7 @@
 
 /**
  * @swagger
- * /api/lawyers:
+ * /lawyers:
  *   get:
  *     summary: Get all lawyers
  *     tags: [Lawyers]
@@ -157,7 +157,7 @@
  *                 example: "Corporate Law"
  *               role:
  *                 type: string
- *                 enum: [Senior Partner, Associate, Secretary]
+ *                 enum: [senior_partner, associate, secretary]
  *                 example: "Associate"
  *     responses:
  *       201:
@@ -180,7 +180,7 @@
 
 /**
  * @swagger
- * /api/lawyers/{id}:
+ * /lawyers/{id}:
  *   get:
  *     summary: Get lawyer by ID
  *     tags: [Lawyers]
@@ -242,7 +242,7 @@
  *                 example: "Corporate Law & Compliance"
  *               role:
  *                 type: string
- *                 enum: [Senior Partner, Associate, Secretary]
+ *                 enum: [senior_partner, associate, secretary]
  *                 example: "Senior Partner"
  *     responses:
  *       200:
@@ -265,7 +265,7 @@
 
 /**
  * @swagger
- * /api/lawyers/{id}/deactivate:
+ * /lawyers/{id}/deactivate:
  *   patch:
  *     summary: Deactivate a lawyer (soft delete)
  *     tags: [Lawyers]
@@ -300,7 +300,7 @@
 
 /**
  * @swagger
- * /api/lawyers/{id}/reactivate:
+ * /lawyers/{id}/reactivate:
  *   patch:
  *     summary: Reactivate a deactivated lawyer
  *     tags: [Lawyers]

@@ -1,26 +1,28 @@
 import express from 'express';
 import * as caseController from '../controllers/caseController.js';
-
+import { authMiddleware, roleMiddleware } from '../middlewares/authMiddleware.js';
+import { ROLES } from '../constants/index.js';
 
 const router = express.Router();
 
-//authMiddleware is applied globally to all case routes in app.js, so no need to apply it here
+// All case routes require authentication
+router.use(authMiddleware);
 
-// Create a new case
-router.post("/", caseController.createCase);
-// Get all cases
-router.get("/", caseController.getAllCases);
+// Create a new case — senior_partner, secretary only
+router.post('/', roleMiddleware([ROLES.SENIOR_PARTNER, ROLES.SECRETARY]), caseController.createCase);
+// Get all cases (associates see only their own)
+router.get('/', caseController.getAllCases);
 // Get a case by ID
-router.get("/:id", caseController.getCaseById);
-// Update a case
-router.put("/:id", caseController.updateCase);
-// Delete a case
-router.delete("/:id", caseController.deleteCase);
-// Assign a lawyer to a case
-router.patch("/:id/assign", caseController.assignLawyer);
-// Update case status
-router.patch("/:id/status", caseController.updateCaseStatus);
+router.get('/:id', caseController.getCaseById);
+// Update a case — senior_partner, secretary only
+router.put('/:id', roleMiddleware([ROLES.SENIOR_PARTNER, ROLES.SECRETARY]), caseController.updateCase);
+// Delete a case — senior_partner only
+router.delete('/:id', roleMiddleware([ROLES.SENIOR_PARTNER]), caseController.deleteCase);
+// Assign a lawyer to a case — senior_partner, secretary only
+router.patch('/:id/assign', roleMiddleware([ROLES.SENIOR_PARTNER, ROLES.SECRETARY]), caseController.assignLawyer);
+// Update case status — any authenticated user
+router.patch('/:id/status', caseController.updateCaseStatus);
 // Get hearings for a case
-router.get("/:id/hearings", caseController.getCaseHearings);
+router.get('/:id/hearings', caseController.getCaseHearings);
 
-// router.get("/:id/hearings", hearingController.getCaseHearings);
+export default router;

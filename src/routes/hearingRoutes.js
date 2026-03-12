@@ -1,21 +1,19 @@
 import express from 'express';
-import hearingController from '../controllers/hearing.controller';
-import authMiddleware from '../middlewares/auth.middleware';
+import * as hearingController from '../controllers/hearingController.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
-// Apply authentication middleware globally to all hearing routes
+
+// All hearing routes require authentication
 router.use(authMiddleware);
 
-// Define hearing routes
-router.get("/", hearingController.getAllHearings);
-router.post("/", hearingController.createHearing);
-router.get("/:id", hearingController.getHearingById);
-router.put("/:id", hearingController.updateHearing);
-router.delete("/:id", hearingController.deleteHearing);
+// /upcoming must be defined BEFORE /:id to avoid Express matching "upcoming" as an ID
+router.get('/upcoming', hearingController.getUpcomingHearings);
 
-//Additional routes for upcoming hearings and case-specific hearings
-router.get("/upcoming", hearingController.getUpcomingHearings);
-router.get("/:id/case-hearings", hearingController.getCaseHearings);
-
+router.get('/', hearingController.getAllHearings);
+router.post('/', hearingController.createHearing);
+router.get('/:id', hearingController.getHearingById);
+router.put('/:id', hearingController.updateHearing);
+router.delete('/:id', hearingController.deleteHearing);
 
 export default router;

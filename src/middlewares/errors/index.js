@@ -78,6 +78,7 @@ const errorHandler = (err, req, res, next) => {
 // ─── Barrel ──────────────────────────────────────────────────────────────────
 
 export {
+  renderOrJson,
   AppError,
   validate,
   isValidationError,

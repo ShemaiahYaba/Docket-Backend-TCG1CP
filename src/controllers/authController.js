@@ -1,73 +1,108 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import User from '../models/User.js';
+import { Lawyer } from '../models/index.js';
+import settings from '../config/settings.js';
+import { HTTP, ERR } from '../constants/index.js';
+import { renderOrJson } from '../middlewares/errors/index.js';
 
-import { HTTP } from '../constants/errorCodes.js';
-import { ERR } from '../constants/errorCodes.js';
+// Register a new lawyer account
+// POST /api/auth/register
+export const register = async (req, res, next) => {
+  try {
+    const { full_name, email, password, phone, specialty, role } = req.body;
 
+    const existing = await Lawyer.findOne({ where: { email } });
+    if (existing) {
+      return renderOrJson(res, req, HTTP.CONFLICT, { success: false, message: 'An account with this email already exists', data: null });
+    }
 
- // Register user
-export const register = async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(HTTP.CONFLICT).json({ message: 'User already exists' });
-        }   
-
-    }catch (error) {
-        res.status(HTTP.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
-    }   
     const hashedPassword = await bcrypt.hash(password, 10);
+    const lawyer = await Lawyer.create({ full_name, email, password: hashedPassword, phone, specialty, role });
 
-    const newUser = await User.create({
-        username,
-        email,
-        password: hashedPassword,
+    const token = jwt.sign(
+      { id: lawyer.id, email: lawyer.email, role: lawyer.role },
+      settings.jwt.secret,
+      { expiresIn: settings.jwt.expiresIn }
+    );
+
+    renderOrJson(res, req, HTTP.CREATED, {
+      success: true,
+      message: 'Account created successfully',
+      data: {
+        token,
+        user: {
+          id: lawyer.id,
+          full_name: lawyer.full_name,
+          email: lawyer.email,
+          role: lawyer.role,
+        },
+      },
     });
-
-    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(201).json({ token });
-
+  } catch (error) {
+    next(error);
+  }
 };
 
- // Login user
-export const login = async (req, res) => {
-    try {
-        const { email, password } = req.body;
+// Login
+// POST /api/auth/login
+export const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-        // Find user by email
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(HTTP.BAD_REQUEST).json({ message: 'Invalid credentials' });
-        }
-
-        // Check if password is correct
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(HTTP.BAD_REQUEST).json({ message: 'Invalid credentials' });
-        }
-
-        // Generate token
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-        res.json({ token });
-    } catch (error) {
-        res.status(HTTP.INTERNAL_SERVER_ERROR).json({ message: 'Server error' });
+    const lawyer = await Lawyer.scope('withPassword').findOne({ where: { email } });
+    if (!lawyer) {
+      return renderOrJson(res, req, HTTP.UNAUTHORIZED, { success: false, message: ERR.INVALID_CREDENTIALS, data: null });
     }
+
+    const isMatch = await bcrypt.compare(password, lawyer.password);
+    if (!isMatch) {
+      return renderOrJson(res, req, HTTP.UNAUTHORIZED, { success: false, message: ERR.INVALID_CREDENTIALS, data: null });
+    }
+
+    if (!lawyer.is_active) {
+      return renderOrJson(res, req, HTTP.UNAUTHORIZED, { success: false, message: ERR.ACCOUNT_INACTIVE, data: null });
+    }
+
+    const token = jwt.sign(
+      { id: lawyer.id, email: lawyer.email, role: lawyer.role },
+      settings.jwt.secret,
+      { expiresIn: settings.jwt.expiresIn }
+    );
+
+    renderOrJson(res, req, HTTP.OK, {
+      success: true,
+      message: 'Login successful',
+      data: {
+        token,
+        user: {
+          id: lawyer.id,
+          full_name: lawyer.full_name,
+          email: lawyer.email,
+          role: lawyer.role,
+        },
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
- // Logout user
+// Logout
+// POST /api/auth/logout
 export const logout = (req, res) => {
-    const auth = req.headers.authorization;
-    if (!auth || !auth.startsWith('Bearer ')) {
-        return res.status(HTTP.UNAUTHORIZED).json({ message: 'No token provided' });
+  renderOrJson(res, req, HTTP.OK, { success: true, message: 'Logged out successfully', data: null });
+};
+
+// Get current authenticated user
+// GET /api/auth/me
+export const me = async (req, res, next) => {
+  try {
+    const lawyer = await Lawyer.findByPk(req.user.id);
+    if (!lawyer) {
+      return renderOrJson(res, req, HTTP.NOT_FOUND, { success: false, message: ERR.NOT_FOUND, data: null });
     }
-    res.json({ message: 'Logged out successfully' });
-
-
-    
+    renderOrJson(res, req, HTTP.OK, { success: true, data: lawyer });
+  } catch (error) {
+    next(error);
+  }
 };
