@@ -112,4 +112,4 @@ router.patch("/:id/deactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidati
 router.patch("/:id/reactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, validate, reactivateLawyer);
 
 
-export const lawyerRoutes = router;
+export default router;
