@@ -1,107 +1,135 @@
-import { Case } from "../models";
+import { Case, Hearing } from '../models/index.js';
+import { HTTP, ERR, ROLES } from '../constants/index.js';
+
+// Generate next SLT-XXX case ID
+const generateCaseId = async () => {
+  const count = await Case.count();
+  return `SLT-${String(count + 1).padStart(3, '0')}`;
+};
 
 // Create new case
 // POST /api/cases
-export const createCase = async (req, res) => {
-    try {
-        const newCase = await Case.create(req.body);
-        return res.status(201).json(newCase);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }   
+export const createCase = async (req, res, next) => {
+  try {
+    const { title, description, case_type, status, client_id, lawyer_id, filed_date } = req.body;
+    const id = await generateCaseId();
+    const newCase = await Case.create({ id, title, description, case_type, status, client_id, lawyer_id, filed_date });
+    return res.status(HTTP.CREATED).json({ success: true, message: 'Case created successfully', data: newCase });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Get all cases (with optional filters)
 // GET /api/cases
+export const getAllCases = async (req, res, next) => {
+  try {
+    const { status, caseType } = req.query;
+    const whereClause = {};
+    if (status) whereClause.status = status;
+    if (caseType) whereClause.case_type = caseType;
 
-export const getAllCases = async (req, res) => {
-    try {
-        const { status, caseType } = req.query;
-        const whereClause = {};
-        if (status) whereClause.status = status;
-        if (caseType) whereClause.case_type = caseType;
-        const cases = await Case.findAll({ where: whereClause });
-        return res.json(cases);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+    // Associates can only see their own assigned cases
+    if (req.user.role === ROLES.ASSOCIATE) {
+      whereClause.lawyer_id = req.user.id;
     }
+
+    const cases = await Case.findAll({ where: whereClause });
+    return res.status(HTTP.OK).json({ success: true, count: cases.length, data: cases });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Get a case by ID
 // GET /api/cases/:id
-export const getCaseById = async (req, res) => {
-    try {
-        const caseItem = await Case.findByPk(req.params.id);
-        if (!caseItem) return res.status(404).json({ message: "Case not found" });
-        return res.json(caseItem);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
-    }       
+export const getCaseById = async (req, res, next) => {
+  try {
+    const caseItem = await Case.findByPk(req.params.id);
+    if (!caseItem) {
+      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
+    }
+    return res.status(HTTP.OK).json({ success: true, data: caseItem });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Update a case
-// PUT /api/cases/:id	Updates case details, senior_partner/secretary only
-export const updateCase = async (req, res) => {
-    try {
-        const caseItem = await Case.findByPk(req.params.id);
-        if (!caseItem) return res.status(404).json({ message: "Case not found" });
-        await caseItem.update(req.body);
-        return res.json(caseItem);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+// PUT /api/cases/:id
+export const updateCase = async (req, res, next) => {
+  try {
+    const caseItem = await Case.findByPk(req.params.id);
+    if (!caseItem) {
+      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
     }
+    const { title, description, case_type, client_id, lawyer_id, filed_date, closed_date } = req.body;
+    await caseItem.update({ title, description, case_type, client_id, lawyer_id, filed_date, closed_date });
+    return res.status(HTTP.OK).json({ success: true, message: 'Case updated successfully', data: caseItem });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // Delete a case
-// @route   DELETE /api/cases/:id
-export const deleteCase = async (req, res) => {
-    try {
-        const caseItem = await Case.findByPk(req.params.id);
-        if (!caseItem) return res.status(404).json({ message: "Case not found" });
-        await caseItem.destroy();
-        return res.json({ message: "Case deleted successfully" });
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+// DELETE /api/cases/:id
+export const deleteCase = async (req, res, next) => {
+  try {
+    const caseItem = await Case.findByPk(req.params.id);
+    if (!caseItem) {
+      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
     }
+    await caseItem.destroy();
+    return res.status(HTTP.OK).json({ success: true, message: 'Case deleted successfully', data: null });
+  } catch (error) {
+    next(error);
+  }
 };
 
-// PATCH /api/cases/:id/assign	Assigns/reassigns lawyer, senior_partner/secretary only
-export const assignLawyer = async (req, res) => {
-    try {
-        const caseItem = await Case.findByPk(req.params.id);
-        if (!caseItem) return res.status(404).json({ message: "Case not found" });
-        const { lawyer_id } = req.body;
-        await caseItem.update({ lawyer_id });
-        return res.json(caseItem);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+// Assign a lawyer to a case
+// PATCH /api/cases/:id/assign
+export const assignLawyer = async (req, res, next) => {
+  try {
+    const caseItem = await Case.findByPk(req.params.id);
+    if (!caseItem) {
+      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
     }
+    const { lawyer_id } = req.body;
+    await caseItem.update({ lawyer_id });
+    return res.status(HTTP.OK).json({ success: true, message: 'Lawyer assigned successfully', data: caseItem });
+  } catch (error) {
+    next(error);
+  }
 };
 
-// PATCH /api/cases/:id/status	Updates status with lifecycle enforcement
-export const updateCaseStatus = async (req, res) => {
-    try {
-        const caseItem = await Case.findByPk(req.params.id);
-        if (!caseItem) return res.status(404).json({ message: "Case not found" });
-        const { status } = req.body;
-        await caseItem.update({ status });
-        return res.json(caseItem);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });
+// Update case status
+// PATCH /api/cases/:id/status
+export const updateCaseStatus = async (req, res, next) => {
+  try {
+    const caseItem = await Case.findByPk(req.params.id);
+    if (!caseItem) {
+      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
     }
+    const { status } = req.body;
+    await caseItem.update({ status });
+    return res.status(HTTP.OK).json({ success: true, message: 'Case status updated', data: caseItem });
+  } catch (error) {
+    next(error);
+  }
 };
 
-
-// GET /api/cases/:id/hearings	Lists all hearings for a case
-export const getCaseHearings = async (req, res) => {
-    try {      
-        const caseItem = await Case.findByPk(req.params.id, {
-            include: [{ model: Hearing, as: 'hearings' }]
-        });
-        if (!caseItem) return res.status(404).json({ message: "Case not found" });
-        return res.json(caseItem.hearings);
-    } catch (error) {
-        return res.status(500).json({ message: error.message });    
-
+// Get hearings for a case
+// GET /api/cases/:id/hearings
+export const getCaseHearings = async (req, res, next) => {
+  try {
+    const caseItem = await Case.findByPk(req.params.id, {
+      include: [{ model: Hearing, as: 'hearings' }],
+    });
+    if (!caseItem) {
+      return res.status(HTTP.NOT_FOUND).json({ success: false, message: 'Case not found', data: null });
     }
+    return res.status(HTTP.OK).json({ success: true, count: caseItem.hearings.length, data: caseItem.hearings });
+  } catch (error) {
+    next(error);
+  }
 };

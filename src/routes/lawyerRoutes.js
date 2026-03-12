@@ -89,31 +89,27 @@ router.use(authMiddleware);
 // @route   GET /api/lawyers
 // @desc    Get all lawyers (Senior partners can see all, others can only see themselves)
 // router.get("/lawyers", authMiddleware(ROLES.SENIOR_PARTNER), getAllLawyers);
-router.get("/lawyers", getAllLawyers);
+router.get("/", getAllLawyers);
 
 // @route   GET /api/lawyers/:id
-// @desc    Get a single lawyer by ID (Senior partners can see all, others can only see themselves)
-router.get("/lawyers/:id", idValidation, validate, getLawyerById);
-
+// @desc    Get a single lawyer by ID
+router.get("/:id", idValidation, validate, getLawyerById);
 
 // @route   POST /api/lawyers
 // @desc    Create a new lawyer (Only senior partners can create lawyers)
-router.post("/lawyers", roleMiddleware(ROLES.SENIOR_PARTNER), createLawyerValidation,validate, createLawyer);
-
+router.post("/", roleMiddleware(ROLES.SENIOR_PARTNER), createLawyerValidation, validate, createLawyer);
 
 // @route   PUT /api/lawyers/:id
-// @desc    Update a lawyer (Senior partners can update all, others can only update themselves)
-router.put("/lawyers/:id", roleMiddleware(ROLES.SENIOR_PARTNER), updateLawyerValidation,validate, updateLawyer);
+// @desc    Update a lawyer (senior_partner only)
+router.put("/:id", roleMiddleware(ROLES.SENIOR_PARTNER), updateLawyerValidation, validate, updateLawyer);
 
+// @route   PATCH /api/lawyers/:id/deactivate
+// @desc    Deactivate a lawyer (senior_partner only)
+router.patch("/:id/deactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, validate, deactivateLawyer);
 
-// @route   DEACTIVATE /api/lawyers/:id/deactivate
-// @desc    Deactivate a lawyer (Senior partners can deactivate all, others can only deactivate themselves)
-router.patch("/lawyers/:id/deactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, validate, deactivateLawyer);
-
-
-// @route REACTIVATE /api/lawyers/:id/reactivate
-// @desc Reactivate a lawyer (Senior partners can reactivate all, others can only reactivate themselves)
-router.patch("/lawyers/:id/reactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, validate, reactivateLawyer);
+// @route   PATCH /api/lawyers/:id/reactivate
+// @desc    Reactivate a lawyer (senior_partner only)
+router.patch("/:id/reactivate", roleMiddleware(ROLES.SENIOR_PARTNER), idValidation, validate, reactivateLawyer);
 
 
 export const lawyerRoutes = router;
