@@ -4,6 +4,7 @@ import defineLawyer from './Lawyer.js';
 import defineClient from './Client.js';
 import defineCase from './Case.js';
 import defineHearing from './Hearing.js';
+import defineEmailLog from './EmailLog.js';
 
 const sequelize = new Sequelize(
   settings.db.name,
@@ -17,12 +18,13 @@ const sequelize = new Sequelize(
   }
 );
 
-const Lawyer  = defineLawyer(sequelize);
-const Client  = defineClient(sequelize);
-const Case    = defineCase(sequelize);
-const Hearing = defineHearing(sequelize);
+const Lawyer   = defineLawyer(sequelize);
+const Client   = defineClient(sequelize);
+const Case     = defineCase(sequelize);
+const Hearing  = defineHearing(sequelize);
+const EmailLog = defineEmailLog(sequelize);
 
-const models = { Lawyer, Client, Case, Hearing };
+const models = { Lawyer, Client, Case, Hearing, EmailLog };
 Object.values(models).forEach((m) => m.associate && m.associate(models));
 
-export { sequelize, Sequelize, Lawyer, Client, Case, Hearing };
+export { sequelize, Sequelize, Lawyer, Client, Case, Hearing, EmailLog };

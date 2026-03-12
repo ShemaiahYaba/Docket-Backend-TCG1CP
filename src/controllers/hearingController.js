@@ -1,7 +1,8 @@
 import { Op } from 'sequelize';
-import { Hearing } from '../models/index.js';
+import { Hearing, Case, Lawyer } from '../models/index.js';
 import { HTTP } from '../constants/index.js';
 import { renderOrJson } from '../middlewares/errors/index.js';
+import { sendHearingConfirmationEmail } from '../services/email/index.js';
 
 // Create new hearing
 // POST /api/hearings
@@ -16,6 +17,16 @@ export const createHearing = async (req, res, next) => {
       notes,
       created_by: req.user.id,
     });
+
+    // Fire-and-forget confirmation email to the assigned lawyer (if any)
+    Case.findByPk(case_id, {
+      include: [{ model: Lawyer, as: 'lawyer', attributes: ['full_name', 'email'] }],
+    }).then((caseItem) => {
+      if (caseItem && caseItem.lawyer) {
+        sendHearingConfirmationEmail(hearing, caseItem.lawyer, caseItem);
+      }
+    }).catch(() => {});
+
     return renderOrJson(res, req, HTTP.CREATED, { success: true, message: 'Hearing created successfully', data: hearing });
   } catch (error) {
     next(error);
