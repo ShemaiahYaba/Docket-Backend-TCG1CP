@@ -61,7 +61,7 @@ module.exports = {
       updated_at: now,
     }));
 
-    await queryInterface.bulkInsert('cases', records, {});
+    await queryInterface.bulkInsert('cases', records, { ignoreDuplicates: true });
   },
 
   async down(queryInterface) {

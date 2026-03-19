@@ -102,7 +102,7 @@ module.exports = {
       updated_at: now,
     }));
 
-    await queryInterface.bulkInsert('hearings', records, {});
+    await queryInterface.bulkInsert('hearings', records, { ignoreDuplicates: true });
   },
 
   async down(queryInterface) {

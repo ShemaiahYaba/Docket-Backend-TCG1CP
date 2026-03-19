@@ -16,6 +16,12 @@ const options = {
       },
     },
     servers: [
+      ...(process.env.RAILWAY_PUBLIC_DOMAIN
+        ? [{
+            url: `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api`,
+            description: "Production server (Railway)",
+          }]
+        : []),
       {
         url: `http://localhost:${settings.port}/api`,
         description: "Local development server",

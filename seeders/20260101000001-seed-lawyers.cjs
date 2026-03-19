@@ -25,7 +25,7 @@ module.exports = {
       updated_at: now,
     }));
 
-    await queryInterface.bulkInsert('lawyers', records, {});
+    await queryInterface.bulkInsert('lawyers', records, { ignoreDuplicates: true });
   },
 
   async down(queryInterface) {
