@@ -21,7 +21,7 @@ const app = express();
 // Security
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(corsMiddleware);
-app.use(morgan("dev"));
+app.use(morgan(settings.isDev ? "dev" : "combined"));
 
 // Body parser
 app.use(express.json());
