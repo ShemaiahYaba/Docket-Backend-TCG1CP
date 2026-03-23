@@ -33,15 +33,34 @@ export const createHearing = async (req, res, next) => {
   }
 };
 
-// Get all hearings (with optional case filter)
-// GET /api/hearings
+// Get all hearings (with optional case filter and date filter)
+// GET /api/hearings?case_id=SLT-001&filter=upcoming|this_week
 export const getAllHearings = async (req, res, next) => {
   try {
-    const { case_id } = req.query;
+    const { case_id, filter } = req.query;
     const whereClause = {};
+
     if (case_id) whereClause.case_id = case_id;
 
-    const hearings = await Hearing.findAll({ where: whereClause, order: [['hearing_date', 'ASC']] });
+    // ?filter=upcoming  → hearings from today onwards
+    // ?filter=this_week → hearings within the next 7 days
+    if (filter === 'upcoming') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      whereClause.hearing_date = { [Op.gte]: today };
+    } else if (filter === 'this_week') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+      whereClause.hearing_date = { [Op.between]: [today, nextWeek] };
+    }
+
+    const hearings = await Hearing.findAll({
+      where: whereClause,
+      order: [['hearing_date', 'ASC'], ['hearing_time', 'ASC']],
+    });
+
     return renderOrJson(res, req, HTTP.OK, { success: true, count: hearings.length, data: hearings });
   } catch (error) {
     next(error);

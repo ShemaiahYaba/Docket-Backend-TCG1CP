@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import { Case, Hearing, Lawyer, Client } from '../models/index.js';
 import { HTTP, ERR, ROLES, CASE_TYPE } from '../constants/index.js';
 import { renderOrJson } from '../middlewares/errors/index.js';
@@ -21,22 +22,60 @@ export const createCase = async (req, res, next) => {
   }
 };
 
-// Get all cases (with optional filters)
-// GET /api/cases
+// Get all cases (with optional filters, search, and pagination)
+// GET /api/cases?status=Active&case_type=Criminal&search=johnson&page=1&limit=10
 export const getAllCases = async (req, res, next) => {
   try {
-    const { status, caseType } = req.query;
+    const { status, case_type, search, page = 1, limit = 20 } = req.query;
+
     const whereClause = {};
-    if (status) whereClause.status = status;
-    if (caseType) whereClause.case_type = caseType;
+    if (status)    whereClause.status    = status;
+    if (case_type) whereClause.case_type = case_type;
 
     // Associates can only see their own assigned cases
     if (req.user.role === ROLES.ASSOCIATE) {
       whereClause.lawyer_id = req.user.id;
     }
 
-    const cases = await Case.findAll({ where: whereClause });
-    return renderOrJson(res, req, HTTP.OK, { success: true, count: cases.length, data: cases });
+    // Search across title, case ID, and client name
+    // '$client.full_name$' is Sequelize's dot-notation for filtering on an association
+    if (search) {
+      whereClause[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { id:    { [Op.like]: `%${search}%` } },
+        { '$client.full_name$': { [Op.like]: `%${search}%` } },
+      ];
+    }
+
+    // Pagination — page 1 starts at offset 0
+    const pageNum  = Math.max(1, parseInt(page, 10));
+    const pageSize = Math.min(100, Math.max(1, parseInt(limit, 10)));
+    const offset   = (pageNum - 1) * pageSize;
+
+    const { count, rows: cases } = await Case.findAndCountAll({
+      where: whereClause,
+      include: [
+        {
+          model: Client,
+          as: 'client',
+          attributes: ['id', 'full_name'],
+          required: false, // LEFT JOIN — keeps cases even if client name doesn't match search
+        },
+      ],
+      order: [['updated_at', 'DESC']],
+      limit: pageSize,
+      offset,
+      distinct: true, // needed with include + findAndCountAll for accurate total count
+    });
+
+    return renderOrJson(res, req, HTTP.OK, {
+      success: true,
+      count: cases.length,
+      total: count,
+      page: pageNum,
+      total_pages: Math.ceil(count / pageSize),
+      data: cases,
+    });
   } catch (error) {
     next(error);
   }
