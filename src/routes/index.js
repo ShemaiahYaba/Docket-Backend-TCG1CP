@@ -37,18 +37,18 @@ router.get("/health", (req, res) => {
 });
 
 // ─── Module Routes ────────────────────────────────────────────────────────────
-import authRoutes from './authRoutes.js';
-import lawyerRoutes from './lawyerRoutes.js';
-import clientRoutes from './clientRoutes.js';
-import caseRoutes from './caseRoutes.js';
-import hearingRoutes from './hearingRoutes.js';
-// import dashboardRoutes from './dashboardRoutes.js';
+import authRoutes      from './authRoutes.js';
+import lawyerRoutes    from './lawyerRoutes.js';
+import clientRoutes    from './clientRoutes.js';
+import caseRoutes      from './caseRoutes.js';
+import hearingRoutes   from './hearingRoutes.js';
+import dashboardRoutes from './dashboardRoutes.js';
 
-router.use('/auth',     authRoutes);
-router.use('/lawyers',  lawyerRoutes);
-router.use('/clients',  clientRoutes);
-router.use('/cases',    caseRoutes);
-router.use('/hearings', hearingRoutes);
-// router.use('/dashboard', dashboardRoutes);
+router.use('/auth',      authRoutes);
+router.use('/lawyers',   lawyerRoutes);
+router.use('/clients',   clientRoutes);
+router.use('/cases',     caseRoutes);
+router.use('/hearings',  hearingRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router;
