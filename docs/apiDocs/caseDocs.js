@@ -111,7 +111,18 @@
  *           example: true
  *         count:
  *           type: integer
+ *           description: Number of records in this page
+ *           example: 10
+ *         total:
+ *           type: integer
+ *           description: Total matching records across all pages
  *           example: 18
+ *         page:
+ *           type: integer
+ *           example: 1
+ *         total_pages:
+ *           type: integer
+ *           example: 2
  *         data:
  *           type: array
  *           items:
@@ -156,14 +167,32 @@
  *           enum: [Active, Pending, In Review, Urgent, Closed]
  *         description: Filter by case status
  *       - in: query
- *         name: caseType
+ *         name: case_type
  *         schema:
  *           type: string
  *           enum: [Civil, Criminal, Corporate, Family, Property]
  *         description: Filter by case type
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Partial match on title, case ID (e.g. SLT-001), or client full name
+ *         example: "johnson"
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number (starts at 1)
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 20
+ *         description: Number of records per page (max 100)
  *     responses:
  *       200:
- *         description: List of cases
+ *         description: Paginated list of cases
  *         content:
  *           application/json:
  *             schema:

@@ -109,6 +109,15 @@
  *           type: string
  *         description: Filter hearings by case ID
  *         example: "SLT-001"
+ *       - in: query
+ *         name: filter
+ *         schema:
+ *           type: string
+ *           enum: [upcoming, this_week]
+ *         description: >
+ *           `upcoming` — hearings from today onwards.
+ *           `this_week` — hearings within the next 7 days.
+ *           Omit to return all hearings.
  *     responses:
  *       200:
  *         description: List of hearings ordered by date ascending
